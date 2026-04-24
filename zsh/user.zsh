@@ -1,5 +1,6 @@
+# shellcheck shell=zsh
 # wired-dots — user zsh config
-# Sourced by zsh after framework init. No HyDE-specific hooks here.
+# Sourced by zsh after framework init. No framework-specific hooks here.
 
 # Startup: fastfetch on interactive shell
 if [[ $- == *i* ]]; then
