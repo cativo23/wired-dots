@@ -1,0 +1,9 @@
+{
+  "custom/uptime": {
+    "exec": "uptime -p | sed 's/up //;s/ hours\\?/h/;s/ minutes\\?/m/;s/ days\\?/d/;s/,//g'",
+    "format": "SYS.ONLINE {}",
+    "interval": 60,
+    "tooltip": true,
+    "tooltip-format": "System uptime: {}"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "custom/separator#l1": { "format": "│", "interval": "once", "tooltip": false },
+  "custom/separator#l2": { "format": "│", "interval": "once", "tooltip": false },
+  "custom/separator#c1": { "format": "│", "interval": "once", "tooltip": false },
+  "custom/separator#r1": { "format": "│", "interval": "once", "tooltip": false },
+  "custom/separator#r2": { "format": "│", "interval": "once", "tooltip": false },
+  "custom/separator#r3": { "format": "│", "interval": "once", "tooltip": false },
+  "custom/separator#r4": { "format": "│", "interval": "once", "tooltip": false }
+}

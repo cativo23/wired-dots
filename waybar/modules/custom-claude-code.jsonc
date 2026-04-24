@@ -1,0 +1,10 @@
+{
+  "custom/claude-code": {
+    "return-type": "json",
+    "exec": "bash -c 'source ${NVM_DIR:-$HOME/.nvm}/nvm.sh 2>/dev/null; waybar-claude-code'",
+    "format": "{text}",
+    "interval": 300,
+    "tooltip": true,
+    "on-click": "${TERMINAL:-kitty} -e claude"
+  }
+}

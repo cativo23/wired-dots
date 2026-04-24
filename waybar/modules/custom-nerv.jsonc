@@ -1,0 +1,9 @@
+{
+  "custom/nerv": {
+    "exec": "echo '{\"text\":\"MAGI\",\"tooltip\":\"'$(hostname -s)' // KERN '$(uname -r | cut -d- -f1)' // NODE '$(ip -4 route get 1.1.1.1 2>/dev/null | grep -oP \"src \\K[0-9.]+\")'\"}'",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "interval": "once"
+  }
+}
