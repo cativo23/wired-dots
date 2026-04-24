@@ -1,0 +1,15 @@
+/* wired-dots — waybar base styles (replaces HyDE's generated defaults.css) */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "mononoki Nerd Font", monospace;
+    font-size: 11px;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+}
+
+window#waybar {
+    background-color: transparent;
+}

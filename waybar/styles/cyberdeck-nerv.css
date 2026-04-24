@@ -1,0 +1,413 @@
+/* CYBERDECK // NERV EDITION v2 — Floating Console Panels */
+/* Tokyo Night terminal aesthetic with sci-fi console accents */
+
+@import "defaults.css";
+
+/* ═══════════════════════════════════════════
+   BAR — fully transparent, panels float
+   ═══════════════════════════════════════════ */
+
+window#waybar {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Reset all default HyDE group/pill styling */
+window#waybar.top #pill,
+window#waybar.bottom #pill {
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* ═══════════════════════════════════════════
+   PANEL BASE — shared terminal panel style
+   ═══════════════════════════════════════════ */
+
+/* Left: MAGI panel — red left accent */
+#magi-panel {
+    background: alpha(#1a1b26, 0.85);
+    border: 1px solid alpha(#f7768e, 0.25);
+    border-left: 3px solid #f7768e;
+    border-radius: 0 4px 4px 0;
+    padding: 0 12px;
+    margin: 2px 3px 2px 0;
+}
+
+/* Left: Window panel */
+#window-panel {
+    background: alpha(#1a1b26, 0.85);
+    border: 1px solid alpha(#7aa2f7, 0.1);
+    border-radius: 4px;
+    padding: 0 12px;
+    margin: 2px 3px;
+}
+
+/* Center: SYS.STAT panel — blue top accent */
+#sysstat-panel {
+    background: alpha(#1a1b26, 0.85);
+    border: 1px solid alpha(#7aa2f7, 0.2);
+    border-top: 1px solid alpha(#7aa2f7, 0.4);
+    border-radius: 4px;
+    padding: 0 12px;
+    margin: 2px 3px;
+}
+
+/* Center: MEDIA panel — purple top accent */
+#media-panel {
+    background: alpha(#1a1b26, 0.85);
+    border: 1px solid alpha(#bb9af7, 0.2);
+    border-top: 1px solid alpha(#bb9af7, 0.3);
+    border-radius: 4px;
+    padding: 0 10px;
+    margin: 2px 3px;
+}
+
+/* Right: Status panel */
+#status-panel {
+    background: alpha(#1a1b26, 0.85);
+    border: 1px solid alpha(#7aa2f7, 0.15);
+    border-radius: 4px;
+    padding: 0 10px;
+    margin: 2px 3px;
+}
+
+/* Right: Clock panel — blue right accent */
+#clock-panel {
+    background: alpha(#1a1b26, 0.85);
+    border: 1px solid alpha(#7aa2f7, 0.2);
+    border-right: 3px solid #7aa2f7;
+    border-radius: 4px 0 0 4px;
+    padding: 0 12px;
+    margin: 2px 0 2px 3px;
+}
+
+/* ═══════════════════════════════════════════
+   PANEL LABELS — dim monospace subsystem tags
+   ═══════════════════════════════════════════ */
+
+#custom-sysstat-label {
+    color: #414868;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 0 4px 0 0;
+}
+
+#custom-media-label {
+    color: #414868;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 0 4px 0 0;
+}
+
+#custom-clock-label {
+    color: #414868;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 0 4px 0 0;
+}
+
+/* ═══════════════════════════════════════════
+   SEPARATORS
+   ═══════════════════════════════════════════ */
+
+#custom-separator {
+    color: #414868;
+    padding: 0 3px;
+    margin: 0;
+    font-size: 9px;
+}
+
+/* ═══════════════════════════════════════════
+   LEFT — MAGI Identity
+   ═══════════════════════════════════════════ */
+
+/* MAGI identifier */
+#custom-nerv {
+    color: #f7768e;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px alpha(#f7768e, 0.5);
+    padding: 0 6px 0 0;
+}
+
+/* Workspaces — numbered 01 02 03 */
+#workspaces button {
+    border-radius: 2px;
+    padding: 0 5px;
+    margin: 3px 1px;
+    font-size: 10px;
+    color: #565f89;
+    background: transparent;
+    min-width: 0;
+    min-height: 0;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    background: alpha(#bb9af7, 0.15);
+    color: #bb9af7;
+    padding: 0 5px;
+    margin: 3px 1px;
+    border-radius: 2px;
+    border-bottom: 1px solid alpha(#bb9af7, 0.5);
+    transition: all 0.3s cubic-bezier(.55, -0.68, .48, 1.682);
+}
+
+#workspaces button:hover {
+    background: alpha(#7aa2f7, 0.15);
+    color: #c0caf5;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.urgent {
+    background: alpha(#f7768e, 0.15);
+    color: #f7768e;
+}
+
+/* Window title */
+#window {
+    color: #a9b1d6;
+    font-size: 10px;
+    padding: 0;
+}
+
+/* ═══════════════════════════════════════════
+   CENTER — System Stats (terminal readout)
+   ═══════════════════════════════════════════ */
+
+#cpu {
+    color: #f7768e;
+    font-size: 10px;
+    padding: 0 4px;
+    text-shadow: 0 0 4px alpha(#f7768e, 0.25);
+}
+
+#memory {
+    color: #bb9af7;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+#temperature {
+    color: #7dcfff;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+#temperature.warning {
+    color: #ff9e64;
+    text-shadow: 0 0 4px alpha(#ff9e64, 0.3);
+}
+
+#temperature.critical {
+    color: #f7768e;
+    text-shadow: 0 0 6px alpha(#f7768e, 0.5);
+}
+
+#custom-gpuinfo {
+    color: #9ece6a;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+/* ═══════════════════════════════════════════
+   CENTER — Media Player
+   ═══════════════════════════════════════════ */
+
+#custom-mediaplayer {
+    color: #a9b1d6;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+#custom-mediaplayer-play-pause {
+    color: #bb9af7;
+    font-size: 11px;
+    padding: 0 3px;
+}
+
+#custom-mediaplayer-play-pause:hover {
+    color: #c0caf5;
+    text-shadow: 0 0 6px alpha(#bb9af7, 0.5);
+}
+
+#custom-mediaplayer-next,
+#custom-mediaplayer-previous {
+    color: #565f89;
+    font-size: 10px;
+    padding: 0 2px;
+}
+
+#custom-mediaplayer-next:hover,
+#custom-mediaplayer-previous:hover {
+    color: #a9b1d6;
+}
+
+/* ═══════════════════════════════════════════
+   RIGHT — Status Cluster
+   ═══════════════════════════════════════════ */
+
+/* Keyboard layout */
+#language {
+    color: #bb9af7;
+    font-size: 10px;
+    padding: 0 6px;
+    min-width: 2em;
+}
+
+/* Backlight (laptop) */
+#backlight {
+    color: #e0af68;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+/* System tray */
+#tray {
+    color: #c0caf5;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    color: #f7768e;
+}
+
+/* Volume */
+#pulseaudio {
+    color: #7dcfff;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+#pulseaudio.muted {
+    color: #565f89;
+}
+
+/* Network */
+#network {
+    color: #9ece6a;
+    font-size: 10px;
+    padding: 0 4px;
+    text-shadow: 0 0 3px alpha(#9ece6a, 0.25);
+}
+
+#network.disconnected {
+    color: #f7768e;
+    text-shadow: 0 0 4px alpha(#f7768e, 0.3);
+}
+
+/* Battery (laptop) */
+#battery {
+    color: #9ece6a;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+#battery.charging {
+    color: #9ece6a;
+    text-shadow: 0 0 4px alpha(#9ece6a, 0.4);
+}
+
+#battery.warning:not(.charging) {
+    color: #e0af68;
+}
+
+#battery.critical:not(.charging) {
+    color: #f7768e;
+    text-shadow: 0 0 6px alpha(#f7768e, 0.5);
+    animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0.6; }
+}
+
+/* Caffeine / Idle inhibitor */
+#idle_inhibitor {
+    color: #565f89;
+    font-size: 10px;
+    padding: 0 3px;
+}
+
+#idle_inhibitor.activated {
+    color: #e0af68;
+    text-shadow: 0 0 4px alpha(#e0af68, 0.4);
+}
+
+/* Updates & Dunst notifications */
+#custom-updates,
+#custom-dunst {
+    color: #9ece6a;
+    font-size: 10px;
+    padding: 0 3px;
+}
+
+/* Keybinds hint */
+#custom-keybindhint {
+    color: #565f89;
+    font-size: 10px;
+    padding: 0 3px;
+}
+
+#custom-keybindhint:hover {
+    color: #7aa2f7;
+}
+
+/* ═══════════════════════════════════════════
+   RIGHT — Clock + Power
+   ═══════════════════════════════════════════ */
+
+#clock {
+    color: #c0caf5;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px alpha(#7aa2f7, 0.5);
+    padding: 0 4px;
+}
+
+#custom-power {
+    color: #f7768e;
+    font-size: 11px;
+    padding: 0 2px 0 4px;
+}
+
+#custom-power:hover {
+    color: #ff007c;
+    text-shadow: 0 0 8px alpha(#ff007c, 0.6);
+}
+
+/* ═══════════════════════════════════════════
+   TOOLTIPS — dark terminal style
+   ═══════════════════════════════════════════ */
+
+tooltip {
+    background: alpha(#1a1b26, 0.95);
+    color: #c0caf5;
+    border: 1px solid alpha(#7aa2f7, 0.3);
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+/* ═══════════════════════════════════════════
+   CLAUDE CODE (kept from v1)
+   ═══════════════════════════════════════════ */
+
+#custom-claude-code {
+    color: #c0caf5;
+    padding: 0 6px;
+}
+
+#custom-claude-code:hover {
+    color: #ff9e64;
+}
