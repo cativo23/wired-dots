@@ -1,0 +1,14 @@
+# wired-dots — Wayland session env vars (sourced by uwsm before Hyprland starts)
+# Do NOT export XDG_CURRENT_DESKTOP here — session file sets it (decision #36).
+
+export QT_QPA_PLATFORMTHEME=qt6ct
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export GDK_BACKEND=wayland,x11
+export GDK_SCALE=1
+export MOZ_ENABLE_WAYLAND=1
+export ELECTRON_OZONE_PLATFORM_HINT=wayland
+export SDL_VIDEODRIVER=wayland
+export CLUTTER_BACKEND=wayland
+export HYPRCURSOR_THEME=phinger-cursors-dark
+export HYPRCURSOR_SIZE=24
