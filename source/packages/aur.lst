@@ -1,0 +1,27 @@
+# wired-dots — AUR packages (installed via paru or yay)
+
+# Screenshot
+hyprshot
+
+# Wallpaper (verify name at build time — upstream may rename)
+# awww
+
+# Browser
+brave-bin
+
+# Themes
+tokyonight-gtk-theme-git
+tela-circle-icon-theme-dracula
+phinger-cursors-dark
+
+# Fonts (those not in core)
+ttf-jetbrains-mono-nerd
+ttf-cascadia-code-nerd
+ttf-nerd-fonts-symbols
+ttf-mononoki-nerd
+
+# Kvantum theme
+kvantum-theme-tokyo-night
+
+# Display manager
+sddm

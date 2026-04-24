@@ -1,0 +1,5 @@
+# AMD GPU packages
+mesa
+vulkan-radeon
+libva-mesa-driver
+mesa-vdpau

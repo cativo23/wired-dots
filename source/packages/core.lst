@@ -1,0 +1,122 @@
+# wired-dots — core pacman packages
+# Format: package # comment
+
+# Compositor + session
+hyprland
+uwsm
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xdg-user-dirs
+
+# Wayland essentials
+wayland
+wayland-protocols
+libdrm
+
+# Bar + notifications
+waybar
+libnotify
+
+# Launcher + tools
+rofi-wayland
+wlogout
+hyprpicker
+nwg-displays
+nwg-look
+
+# Lock + idle
+hyprlock
+hypridle
+hyprsunset
+
+# Audio (PipeWire stack)
+pipewire
+pipewire-alsa
+pipewire-audio
+pipewire-jack
+pipewire-pulse
+wireplumber
+gst-plugin-pipewire
+pavucontrol
+pwvucontrol
+pamixer
+playerctl
+
+# Audio firmware
+sof-firmware
+alsa-ucm-conf
+alsa-firmware
+
+# Bluetooth
+bluez
+bluez-utils
+blueman
+
+# Network
+networkmanager
+network-manager-applet
+
+# Brightness
+brightnessctl
+ddcutil
+
+# Polkit
+hyprpolkitagent
+
+# Qt compat
+qt5-wayland
+qt6-wayland
+qt5ct
+qt6ct
+qt5-graphicaleffects
+qt5-quickcontrols
+qt5-quickcontrols2
+qt5-imageformats
+qt6-5compat
+qt6-declarative
+kvantum
+kvantum-qt5
+
+# File manager
+nautilus
+udiskie
+
+# Clipboard
+cliphist
+wl-clip-persist
+
+# Screenshot
+satty
+grim
+slurp
+
+# Wallpaper daemon
+swww
+
+# Power
+power-profiles-daemon
+acpid
+
+# System utils
+jq
+fzf
+unzip
+parallel
+imagemagick
+pacman-contrib
+kde-cli-tools
+gnome-keyring
+libsecret
+
+# GTK theme tools
+gtk-engine-murrine
+gnome-themes-extra
+
+# Terminal
+kitty
+
+# Shell
+zsh
+starship
+bat
+fastfetch

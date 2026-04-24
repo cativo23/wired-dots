@@ -1,0 +1,39 @@
+# wired-dots — GPU detection database
+# Format: pci_prefix|generation|package_list|cmdline_extras|env_vars
+# pci_prefix matches against `lspci -nn -d ::0300` and `::0302` output.
+# Multiple matches → hybrid path.
+
+# NVIDIA Turing+ (RTX 20xx-50xx, GeForce 16xx GTX)
+10de:1e|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:1f|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:20|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:21|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:24|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:26|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:27|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+
+# NVIDIA Maxwell/Pascal (GTX 9xx/10xx)
+10de:13|nvidia-maxwell-pascal|gpu-nvidia-maxwell-pascal.lst|nvidia_drm.modeset=1|
+10de:15|nvidia-maxwell-pascal|gpu-nvidia-maxwell-pascal.lst|nvidia_drm.modeset=1|
+10de:17|nvidia-maxwell-pascal|gpu-nvidia-maxwell-pascal.lst|nvidia_drm.modeset=1|
+
+# NVIDIA Fermi/Kepler (GTX 6xx/7xx)
+10de:11|nvidia-fermi-kepler|gpu-nvidia-fermi-kepler.lst||
+10de:0f|nvidia-fermi-kepler|gpu-nvidia-fermi-kepler.lst||
+
+# Intel Xe/Arc/Iris/UHD (11th gen+)
+8086:9a|intel-xe-arc|gpu-intel.lst||
+8086:46|intel-xe-arc|gpu-intel.lst||
+8086:56|intel-xe-arc|gpu-intel.lst||
+
+# Intel legacy (pre-11th gen i965)
+8086:3e|intel-legacy-i965|gpu-intel.lst||
+8086:5a|intel-legacy-i965|gpu-intel.lst||
+
+# AMD RDNA (RX 5xxx+)
+1002:73|amd-rdna|gpu-amd.lst||
+1002:74|amd-rdna|gpu-amd.lst||
+
+# AMD Legacy GCN (pre-RX 5xxx)
+1002:68|amd-legacy-gcn|gpu-amd.lst||
+1002:69|amd-legacy-gcn|gpu-amd.lst||

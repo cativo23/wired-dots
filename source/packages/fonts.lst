@@ -1,0 +1,12 @@
+# wired-dots — fonts (installed by 03d_fonts.sh)
+
+# Nerd Fonts (via AUR)
+ttf-jetbrains-mono-nerd
+ttf-cascadia-code-nerd
+ttf-mononoki-nerd
+ttf-nerd-fonts-symbols
+noto-fonts
+noto-fonts-emoji
+
+# Red Hat Display (for hyprlock)
+ttf-red-hat-fonts

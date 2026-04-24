@@ -1,0 +1,5 @@
+# NVIDIA Turing+ (RTX 20xx, 30xx, 40xx, 50xx) — open kernel module
+nvidia-open-dkms
+nvidia-utils
+libva-nvidia-driver
+nvidia-settings

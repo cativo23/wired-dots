@@ -1,0 +1,11 @@
+@theme "~/.config/rofi/themes/tokyo-night.rasi"
+
+configuration {
+    modi: "drun,window,filebrowser";
+    show-icons: true;
+    icon-theme: "Tela-circle-dracula";
+    drun-display-format: "{name}";
+    hover-select: false;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+}

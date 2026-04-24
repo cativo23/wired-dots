@@ -1,0 +1,6 @@
+# Intel GPU packages
+vulkan-intel
+# Modern Xe/Arc/Meteor Lake:
+intel-media-driver
+# Legacy i965 (mutually exclusive with intel-media-driver — installer selects):
+# libva-intel-driver

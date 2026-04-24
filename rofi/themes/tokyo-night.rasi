@@ -1,0 +1,79 @@
+/* wired-dots — rofi Tokyo Night theme */
+
+* {
+    bg0:     #1a1b26;
+    bg1:     #24283b;
+    bg2:     #292e42;
+    fg0:     #c0caf5;
+    fg1:     #a9b1d6;
+    accent:  #7aa2f7;
+    purple:  #bb9af7;
+    red:     #f7768e;
+    muted:   #565f89;
+
+    background-color: transparent;
+    text-color:       @fg0;
+}
+
+window {
+    background-color: @bg0;
+    border:           1px solid @accent;
+    border-radius:    8px;
+    width:            600px;
+    padding:          12px;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing:          8px;
+    padding:          0;
+}
+
+inputbar {
+    background-color: @bg1;
+    border:           1px solid @bg2;
+    border-radius:    4px;
+    padding:          8px 12px;
+    spacing:          8px;
+    children:         [ prompt, entry ];
+}
+
+prompt {
+    color: @accent;
+}
+
+entry {
+    color: @fg0;
+}
+
+listview {
+    background-color: transparent;
+    spacing:          4px;
+    scrollbar:        false;
+}
+
+element {
+    background-color: transparent;
+    border-radius:    4px;
+    padding:          8px 12px;
+}
+
+element-text {
+    color: @fg1;
+}
+
+element-icon {
+    size: 24px;
+}
+
+element.selected {
+    background-color: @bg2;
+}
+
+element.selected > element-text {
+    color: @fg0;
+}
+
+element.active > element-text {
+    color: @accent;
+}
