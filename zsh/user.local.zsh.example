@@ -1,0 +1,15 @@
+# user.local.zsh.example — copy to user.local.zsh (gitignored)
+# Machine-specific configuration: tokens, VPN aliases, paths.
+
+# Anthropic token (required for claude waybar module)
+# export ANTHROPIC_AUTH_TOKEN="sk-ant-..."
+
+# Optional: local Claude proxy
+# export ANTHROPIC_BASE_URL="http://localhost:8317"
+
+# Work VPN
+# alias vpn-up='sudo wg-quick up wg0'
+# alias vpn-down='sudo wg-quick down wg0'
+
+# Machine-specific paths
+# export PATH="$HOME/.local/bin/custom:$PATH"
