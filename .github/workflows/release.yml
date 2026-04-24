@@ -1,0 +1,42 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract changelog for tag
+        id: changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          # Pull the section between "## [X.Y.Z]" and the next "## [" in CHANGELOG.md
+          awk -v ver="$version" '
+              BEGIN { inside=0 }
+              /^## \[/ {
+                  if (inside) { exit }
+                  if (index($0, "[" ver "]") > 0) { inside=1; next }
+              }
+              inside { print }
+          ' CHANGELOG.md > release-notes.md || true
+          echo "notes_file=release-notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: ${{ steps.changelog.outputs.notes_file }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

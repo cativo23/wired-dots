@@ -1,0 +1,34 @@
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Machine-local configs
+hypr/monitors.conf
+zsh/user.local.zsh
+
+# Installer state
+.cache/
+scripts/migrations/.applied
+
+# Build artifacts
+*.log
+*.bak
+
+# Secrets (defense in depth — repo should never contain these)
+.env*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Screenshots raw sources
+docs/screenshots/*.kra
+docs/screenshots/*.xcf
+
+# Package caches
+source/wallpapers/*.part
+*.pkg.tar.zst

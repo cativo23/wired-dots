@@ -1,0 +1,47 @@
+name: verify-packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'source/packages/**'
+  pull_request:
+    paths:
+      - 'source/packages/**'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools + refresh pacman DB
+        run: |
+          pacman -Sy --noconfirm --needed grep coreutils
+
+      - name: Verify repo package names
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail=0
+          for lst in source/packages/*.lst; do
+              [ -f "$lst" ] || continue
+              # skip AUR lists and gpu-legacy lists in this job — those need yay
+              case "$(basename "$lst")" in
+                  aur.lst|gpu-nvidia-maxwell-pascal.lst|gpu-nvidia-fermi-kepler.lst) continue ;;
+              esac
+              while IFS= read -r pkg; do
+                  [ -n "$pkg" ] || continue
+                  pkg="${pkg%%#*}"       # strip comments
+                  pkg="${pkg%%[[:space:]]}"
+                  [ -n "$pkg" ] || continue
+                  if ! pacman -Si "$pkg" >/dev/null 2>&1; then
+                      echo "::error file=$lst::$pkg not found in official repos"
+                      fail=1
+                  fi
+              done < <(grep -vE '^\s*(#|$)' "$lst" | awk '{print $1}')
+          done
+          exit "$fail"

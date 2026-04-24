@@ -1,0 +1,53 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: |
+            README.md
+            docs/**/*.md
+            CHANGELOG.md
+
+  actions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: actionlint
+        uses: raven-actions/actionlint@v2
+
+  css:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gtk4-builder-tool
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-bin
+      - name: Validate shipped CSS files
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail=0
+          # Collect all shipped CSS files.
+          # In M0 there may be none; that's fine — exit 0 if no matches.
+          mapfile -d '' files < <(find waybar swaync kitty rofi home -name '*.css' -print0 2>/dev/null || true)
+          if [ "${#files[@]}" -eq 0 ]; then
+              echo "No CSS files shipped yet — skipping CSS validation."
+              exit 0
+          fi
+          for f in "${files[@]}"; do
+              # gtk4-builder-tool validate requires a .ui file — for raw CSS, do a parser sanity check.
+              if ! awk 'BEGIN{d=0} /\{/{d++} /\}/{d--} END{if(d!=0){exit 1}}' "$f"; then
+                  echo "::error file=$f::unbalanced braces"
+                  fail=1
+              fi
+          done
+          exit "$fail"
