@@ -1,0 +1,8 @@
+{
+    "custom/power-profile": {
+        "exec": "profile=$(powerprofilesctl get 2>/dev/null); case $profile in performance) echo '{\"text\":\"󱐋\",\"tooltip\":\"Power: performance\",\"class\":\"performance\"}' ;; power-saver) echo '{\"text\":\"󰌪\",\"tooltip\":\"Power: power-saver\",\"class\":\"powersaver\"}' ;; *) echo '{\"text\":\"󰗑\",\"tooltip\":\"Power: balanced\",\"class\":\"balanced\"}' ;; esac",
+        "return-type": "json",
+        "interval": 10,
+        "on-click": "~/.local/bin/power-profile-switch"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "custom/hyprsunset": {
+        "exec": "systemctl --user is-active hyprsunset.service >/dev/null 2>&1 && echo '{\"text\":\"󱩌\",\"tooltip\":\"Blue light: ON (4500K)\",\"class\":\"active\"}' || echo '{\"text\":\"󱩋\",\"tooltip\":\"Blue light: OFF\",\"class\":\"inactive\"}'",
+        "return-type": "json",
+        "interval": 5,
+        "on-click": "systemctl --user is-active hyprsunset.service >/dev/null 2>&1 && systemctl --user stop hyprsunset.service || systemctl --user start hyprsunset.service"
+    }
+}
