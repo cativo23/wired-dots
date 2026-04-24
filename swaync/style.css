@@ -1,0 +1,149 @@
+/* wired-dots — swaync Tokyo Night style */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+}
+
+.notification-row {
+    outline: none;
+    margin: 0;
+    padding: 0;
+}
+
+.notification-row:focus,
+.notification-row:hover {
+    background: rgba(122, 162, 247, 0.05);
+}
+
+.notification {
+    border-radius: 6px;
+    margin: 6px 12px;
+    box-shadow: 0 0 0 1px rgba(122, 162, 247, 0.15);
+    padding: 0;
+}
+
+.notification-content {
+    background: rgba(26, 27, 38, 0.95);
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.close-button {
+    background: rgba(247, 118, 142, 0.15);
+    color: #f7768e;
+    border-radius: 4px;
+    margin: 4px;
+    padding: 2px 6px;
+    border: none;
+    font-size: 11px;
+}
+
+.close-button:hover {
+    background: rgba(247, 118, 142, 0.3);
+}
+
+.notification-default-action {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    margin: 0;
+    padding: 0;
+}
+
+.notification-default-action:hover {
+    background: rgba(122, 162, 247, 0.05);
+}
+
+.summary {
+    font-size: 13px;
+    font-weight: bold;
+    color: #c0caf5;
+}
+
+.body {
+    font-size: 12px;
+    color: #a9b1d6;
+}
+
+.app-name {
+    font-size: 11px;
+    color: #565f89;
+}
+
+.time {
+    font-size: 11px;
+    color: #414868;
+}
+
+.control-center {
+    background: rgba(26, 27, 38, 0.97);
+    border: 1px solid rgba(122, 162, 247, 0.2);
+    border-radius: 8px;
+}
+
+.control-center-list {
+    background: transparent;
+}
+
+.control-center-list-placeholder {
+    opacity: 0.5;
+}
+
+.floating-notifications {
+    background: transparent;
+}
+
+.blank-window {
+    background: transparent;
+}
+
+.widget-title {
+    color: #7aa2f7;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin: 8px 12px 4px;
+}
+
+.widget-title > button {
+    font-size: 11px;
+    color: #565f89;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
+.widget-title > button:hover {
+    background: rgba(247, 118, 142, 0.15);
+    color: #f7768e;
+}
+
+.widget-dnd {
+    margin: 8px 12px;
+    font-size: 12px;
+}
+
+.widget-dnd > switch {
+    background: rgba(86, 95, 137, 0.3);
+    border: 1px solid rgba(86, 95, 137, 0.5);
+    border-radius: 20px;
+}
+
+.widget-dnd > switch:checked {
+    background: rgba(187, 154, 247, 0.4);
+    border-color: #bb9af7;
+}
+
+.widget-dnd > switch slider {
+    background: #c0caf5;
+    border-radius: 20px;
+    min-width: 16px;
+    min-height: 16px;
+}
+
+.urgent {
+    border-color: rgba(247, 118, 142, 0.6);
+    box-shadow: 0 0 8px rgba(247, 118, 142, 0.3);
+}
