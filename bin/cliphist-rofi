@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# wired-dots — cliphist rofi picker
+set -euo pipefail
+
+selected=$(cliphist list | rofi -dmenu -p "Clipboard" -theme-str 'window {width: 600px;}')
+[ -z "$selected" ] && exit 0
+cliphist decode <<< "$selected" | wl-copy

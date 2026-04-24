@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# wired-dots — power profile cycler (performance → balanced → power-saver)
+set -euo pipefail
+
+current=$(powerprofilesctl get 2>/dev/null || echo "balanced")
+case "$current" in
+    performance) next="balanced" ;;
+    balanced)    next="power-saver" ;;
+    *)           next="performance" ;;
+esac
+
+powerprofilesctl set "$next"
+notify-send -t 2000 "Power Profile" "Switched to: $next"

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# wired-dots — wallpaper switcher
+# Ensures awww-daemon is running then sends command.
+# Usage: wallpaper [set <file>|next|prev]
+set -euo pipefail
+
+WALLPAPER_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wired-dots/wallpapers"
+
+ensure_daemon() {
+    pgrep -x awww-daemon >/dev/null 2>&1 || { awww-daemon & sleep 0.5; }
+}
+
+case "${1:-}" in
+    set)
+        [ -z "${2:-}" ] && { echo "Usage: wallpaper set <file>" >&2; exit 1; }
+        ensure_daemon
+        awww img "$2"
+        ;;
+    next)
+        ensure_daemon
+        mapfile -t walls < <(find "$WALLPAPER_DIR" -maxdepth 1 \
+            \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) | sort)
+        [ "${#walls[@]}" -eq 0 ] && { echo "No wallpapers in $WALLPAPER_DIR" >&2; exit 1; }
+        current=$(awww query img 2>/dev/null || echo "")
+        idx=0
+        for i in "${!walls[@]}"; do
+            [[ "${walls[$i]}" == "$current" ]] && idx=$(( (i + 1) % ${#walls[@]} )) && break
+        done
+        awww img "${walls[$idx]}"
+        ;;
+    prev)
+        ensure_daemon
+        mapfile -t walls < <(find "$WALLPAPER_DIR" -maxdepth 1 \
+            \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) | sort)
+        [ "${#walls[@]}" -eq 0 ] && { echo "No wallpapers in $WALLPAPER_DIR" >&2; exit 1; }
+        current=$(awww query img 2>/dev/null || echo "")
+        idx=$(( ${#walls[@]} - 1 ))
+        for i in "${!walls[@]}"; do
+            [[ "${walls[$i]}" == "$current" ]] && idx=$(( (i - 1 + ${#walls[@]}) % ${#walls[@]} )) && break
+        done
+        awww img "${walls[$idx]}"
+        ;;
+    "")
+        echo "Usage: wallpaper set <file>|next|prev" >&2; exit 1 ;;
+    *)
+        echo "Unknown command: $1" >&2; exit 1 ;;
+esac
