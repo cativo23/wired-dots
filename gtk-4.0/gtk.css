@@ -1,0 +1,39 @@
+/* wired-dots — GTK4 CSS overrides (Tokyo Night)
+   WARNING: syntax errors here hang pavucontrol/nautilus at 99% CPU.
+   Validate with: gtk4-builder-tool validate (or brace-balance check). */
+
+window,
+.background {
+    background-color: #1a1b26;
+    color: #c0caf5;
+}
+
+headerbar {
+    background-color: #24283b;
+    border-bottom: 1px solid #292e42;
+    color: #c0caf5;
+}
+
+button {
+    background-color: #292e42;
+    color: #c0caf5;
+    border: 1px solid #414868;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #364a82;
+    border-color: #7aa2f7;
+}
+
+entry {
+    background-color: #24283b;
+    color: #c0caf5;
+    border: 1px solid #414868;
+    border-radius: 4px;
+}
+
+entry:focus {
+    border-color: #7aa2f7;
+    box-shadow: 0 0 0 2px rgba(122, 162, 247, 0.25);
+}

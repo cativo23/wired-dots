@@ -1,0 +1,23 @@
+# wired-dots — WirePlumber RNNoise noise suppression
+# Deployed by 03c_audio.sh when --with-noise-suppression is passed.
+# To enable manually: cp this file to 51-rnnoise.conf and restart WirePlumber.
+
+monitor.alsa.rules = [
+  {
+    matches = [ { node.name = "~alsa_input.*" } ]
+    actions = {
+      update-props = {
+        audio.rate = 48000
+        session.suspend-timeout-seconds = 0
+      }
+    }
+  }
+]
+
+wireplumber.profiles = {
+  main = {
+    monitor.alsa = enabled
+    monitor.bluez = enabled
+    monitor.v4l2 = enabled
+  }
+}

@@ -1,0 +1,13 @@
+[%General]
+author=wired-dots
+comment=TokyoNight Kvantum theme pointer
+x11drag=true
+alt_mnemonic=true
+left_tabs=true
+attach_active_tab=false
+mirror_doc_tabs=true
+scroll_width=12
+slider_width=6
+check_size=13
+pind_size=13
+indicator_size=10
