@@ -1,4 +1,4 @@
-# shellcheck shell=zsh
+# shellcheck shell=bash
 # wired-dots — user zsh config
 # Sourced by zsh after framework init. No framework-specific hooks here.
 
