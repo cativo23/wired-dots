@@ -1,0 +1,124 @@
+// CYBERDECK // NERV EDITION v2 — Floating Console Panels
+{
+    "layer": "top",
+    "output": ["*"],
+    "height": 38,
+    "exclusive": true,
+    "passthrough": false,
+    "reload_style_on_change": true,
+    "margin-top": 4,
+    "margin-left": 6,
+    "margin-right": 6,
+    "include": [
+        "$XDG_CONFIG_HOME/waybar/modules/*json*",
+        "$XDG_CONFIG_HOME/waybar/includes/includes.json"
+    ],
+    "modules-left": [
+        "group/magi-panel",
+        "group/window-panel"
+    ],
+    "modules-center": [
+        "group/sysstat-panel",
+        "group/media-panel"
+    ],
+    "modules-right": [
+        "group/status-panel",
+        "group/clock-panel"
+    ],
+
+    "group/magi-panel": {
+        "orientation": "inherit",
+        "modules": ["custom/nerv", "hyprland/workspaces#console"]
+    },
+
+    "hyprland/workspaces#console": {
+        "format": "{id}",
+        "on-click": "activate",
+        "persistent-workspaces": { "*": 4 },
+        "sort-by-number": true
+    },
+
+    "group/window-panel": {
+        "orientation": "inherit",
+        "modules": ["hyprland/window#console"]
+    },
+
+    "hyprland/window#console": {
+        "format": "▸ {title}",
+        "max-length": 25,
+        "rewrite": {
+            "(.*) — Mozilla Firefox": "firefox: $1",
+            "(.*) - Brave": "brave: $1",
+            "(.*)": "$1"
+        }
+    },
+
+    "group/sysstat-panel": {
+        "orientation": "inherit",
+        "modules": ["custom/sysstat-label", "cpu", "memory", "temperature", "custom/gpuinfo"]
+    },
+
+    "custom/sysstat-label": {
+        "format": "SYS.STAT ▸",
+        "tooltip": false,
+        "interval": "once"
+    },
+
+    "group/media-panel": {
+        "orientation": "inherit",
+        "modules": [
+            "custom/media-label",
+            "custom/mediaplayer",
+            "custom/mediaplayer-previous",
+            "custom/mediaplayer-play-pause",
+            "custom/mediaplayer-next"
+        ]
+    },
+
+    "custom/media-label": {
+        "format": "MEDIA ▸",
+        "tooltip": false,
+        "interval": "once"
+    },
+
+    "custom/mediaplayer": { "max-length": 30 },
+
+    "group/status-panel": {
+        "orientation": "inherit",
+        "modules": [
+            "hyprland/language",
+            "backlight",
+            "tray",
+            "pulseaudio",
+            "network",
+            "battery",
+            "custom/separator#s1",
+            "idle_inhibitor",
+            "custom/swaync",
+            "custom/uptime"
+        ]
+    },
+
+    "custom/separator#s1": {
+        "format": "|",
+        "tooltip": false,
+        "interval": "once"
+    },
+
+    "group/clock-panel": {
+        "orientation": "inherit",
+        "modules": ["custom/clock-label", "clock", "custom/power"]
+    },
+
+    "hyprland/language": {
+        "format": "{shortDescription}",
+        "on-click": "hyprctl switchxkblayout all next",
+        "min-length": 2
+    },
+
+    "custom/clock-label": {
+        "format": "CLK",
+        "tooltip": false,
+        "interval": "once"
+    }
+}
