@@ -1,0 +1,117 @@
+/* wired-dots — wlogout Tokyo Night style
+   HyDE template vars hardcoded: fntSize=18, mgn=10, hvr=5, button_rad=10, active_rad=10 */
+
+* {
+    background-image: none;
+    font-size: 18px;
+    font-family: "mononoki Nerd Font", "JetBrainsMono Nerd Font", monospace;
+}
+
+window {
+    background-color: rgba(26, 27, 38, 0.92);
+}
+
+button {
+    color: #565f89;
+    background-color: #24283b;
+    outline-style: none;
+    border: 1px solid rgba(122, 162, 247, 0.2);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25%;
+    border-radius: 0px;
+    box-shadow: none;
+    text-shadow: none;
+    margin-top: 80px;
+    margin-bottom: 80px;
+}
+
+button:focus {
+    background-color: rgba(122, 162, 247, 0.08);
+    background-size: 30%;
+}
+
+button:hover {
+    background-size: 35%;
+    transition: all 0.3s cubic-bezier(.55, 0.0, .28, 1.682);
+}
+
+#lock {
+    border-radius: 10px 0px 0px 10px;
+    margin: 10px 0px 10px 10px;
+    background-image: image(url("/usr/share/wlogout/icons/lock.png"));
+}
+button:hover#lock {
+    border-radius: 10px;
+    margin: 5px 0px 5px 10px;
+    color: #7aa2f7;
+    border-color: #7aa2f7;
+    box-shadow: 0 0 15px rgba(122, 162, 247, 0.3);
+    text-shadow: 0 0 16px #7aa2f7;
+}
+
+#logout {
+    margin: 10px 0px;
+    background-image: image(url("/usr/share/wlogout/icons/logout.png"));
+}
+button:hover#logout {
+    border-radius: 10px;
+    margin: 5px 0px;
+    color: #bb9af7;
+    border-color: #bb9af7;
+    box-shadow: 0 0 15px rgba(187, 154, 247, 0.3);
+    text-shadow: 0 0 16px #bb9af7;
+}
+
+#suspend {
+    margin: 10px 0px;
+    background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
+}
+button:hover#suspend {
+    border-radius: 10px;
+    margin: 5px 0px;
+    color: #e0af68;
+    border-color: #e0af68;
+    box-shadow: 0 0 15px rgba(224, 175, 104, 0.3);
+    text-shadow: 0 0 16px #e0af68;
+}
+
+#shutdown {
+    margin: 10px 0px;
+    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"));
+}
+button:hover#shutdown {
+    border-radius: 10px;
+    margin: 5px 0px;
+    color: #f7768e;
+    border-color: #f7768e;
+    box-shadow: 0 0 15px rgba(247, 118, 142, 0.3);
+    text-shadow: 0 0 16px #f7768e;
+}
+
+#hibernate {
+    margin: 10px 0px;
+    background-image: image(url("/usr/share/wlogout/icons/hibernate.png"));
+}
+button:hover#hibernate {
+    border-radius: 10px;
+    margin: 5px 0px;
+    color: #7dcfff;
+    border-color: #7dcfff;
+    box-shadow: 0 0 15px rgba(125, 207, 255, 0.3);
+    text-shadow: 0 0 16px #7dcfff;
+}
+
+#reboot {
+    border-radius: 0px 10px 10px 0px;
+    margin: 10px 10px 10px 0px;
+    background-image: image(url("/usr/share/wlogout/icons/reboot.png"));
+}
+button:hover#reboot {
+    border-radius: 10px;
+    margin: 5px 10px 5px 0px;
+    color: #9ece6a;
+    border-color: #9ece6a;
+    box-shadow: 0 0 15px rgba(158, 206, 106, 0.3);
+    text-shadow: 0 0 16px #9ece6a;
+}

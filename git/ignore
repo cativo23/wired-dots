@@ -1,0 +1,31 @@
+# wired-dots — global gitignore (~/.config/git/ignore)
+
+# OS / editor artifacts
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Machine-local configs
+hypr/monitors.conf
+zsh/user.local.zsh
+.claude/settings.local.json
+
+# Secrets (defense-in-depth)
+.env*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Build artifacts
+*.log
+*.bak
+node_modules/
+__pycache__/
+.direnv/
+
+# Package caches
+*.pkg.tar.zst
