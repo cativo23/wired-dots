@@ -1,0 +1,142 @@
+# "$schema" = 'https://starship.rs/config-schema.json'
+# =============================================================================
+# MAGI.PROMPT — Tokyo Night / NERV terminal
+# Minimalist starship config: single-line, focused on daily stack
+# =============================================================================
+
+add_newline = false
+palette = "tokyonight"
+
+format = """\
+[󰣇](fg:#f7768e) $username$directory$git_branch$git_status
+$character"""
+
+right_format = """\
+$docker_context\
+$kubernetes\
+$aws\
+$conda\
+$nodejs\
+$php\
+$python\
+$golang\
+$rust\
+$cmd_duration\
+$status\
+$time\
+"""
+
+continuation_prompt = '[··](fg:#414868) '
+
+# --- Palette -----------------------------------------------------------------
+
+[palettes.tokyonight]
+red = '#f7768e'
+orange = '#ff9e64'
+yellow = '#e0af68'
+green = '#9ece6a'
+teal = '#73daca'
+cyan = '#7dcfff'
+blue = '#7aa2f7'
+purple = '#bb9af7'
+white = '#c0caf5'
+black = '#414868'
+muted = '#565f89'
+
+# --- Left: directory + git ---------------------------------------------------
+
+[directory]
+read_only = " 󰌾"
+read_only_style = "bold fg:#f7768e"
+format = "[─\\[](fg:#414868)[$path](bold fg:#7aa2f7)[$read_only](fg:#f7768e)[\\]](fg:#414868)"
+truncate_to_repo = false
+truncation_length = 4
+home_symbol = "~"
+
+[git_branch]
+format = "[─\\[](fg:#414868)[ $branch](fg:#73daca)[\\]](fg:#414868)"
+
+[git_status]
+ahead = '⇡${count}'
+behind = '⇣${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+conflicted = '='
+modified = '●'
+staged = '+'
+untracked = '?'
+stashed = '\$'
+deleted = '✘'
+renamed = '»'
+format = '([\[](fg:#414868)[$all_status$ahead_behind](fg:#7dcfff)[\]](fg:#414868))'
+style = "fg:#7dcfff"
+
+[username]
+show_always = true
+style_user = "bold fg:#bb9af7"
+style_root = "bold fg:#f7768e"
+format = "[$user]($style) "
+
+[character]
+success_symbol = "[>_](bold fg:#9ece6a)"
+error_symbol = "[>_](bold fg:#f7768e)"
+vimcmd_symbol = "[<_](bold fg:#7aa2f7)"
+
+# --- Right: runtime context --------------------------------------------------
+
+[time]
+disabled = false
+format = '[⏲ $time](fg:#565f89) '
+time_format = "%R"
+
+[cmd_duration]
+min_time = 2000
+format = "[took $duration](fg:#ff9e64) "
+
+[status]
+disabled = false
+format = '[\[$status\]](fg:#f7768e) '
+
+# --- Container / orchestration -----------------------------------------------
+
+[docker_context]
+only_with_files = true
+detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile", "compose.yml", "compose.yaml"]
+format = '[\[󰡨 $context\]](fg:#7aa2f7) '
+
+[kubernetes]
+disabled = false
+format = '[\[󱃾 $context(:$namespace)\]](fg:#bb9af7) '
+
+# --- Cloud -------------------------------------------------------------------
+
+[aws]
+disabled = false
+format = '[\[  $profile$region\]](fg:#e0af68) '
+
+[conda]
+format = '[\[ ◯ $environment\]](fg:#9ece6a) '
+
+# --- Languages (daily stack + learning) --------------------------------------
+
+[nodejs]
+detect_extensions = []
+detect_files = ["package-lock.json", "yarn.lock", "package.json"]
+detect_folders = ["node_modules"]
+format = '[\[  ($version)\]](fg:#9ece6a) '
+version_format = "v${raw}"
+
+[php]
+format = '[\[  ($version)\]](fg:#bb9af7) '
+version_format = "${raw}"
+
+[python]
+format = '[\[  ($version)( $virtualenv)\]](fg:#e0af68) '
+version_format = "${raw}"
+
+[golang]
+format = '[\[  ($version)\]](fg:#7dcfff) '
+version_format = "${raw}"
+
+[rust]
+format = '[\[  ($version)\]](fg:#f7768e) '
+version_format = "${raw}"

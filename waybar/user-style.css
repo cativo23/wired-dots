@@ -1,0 +1,11 @@
+/* User custom styles */
+
+#custom-claude-code {
+  padding: 0 10px;
+  margin: 0 2px;
+  color: inherit;
+}
+
+#custom-claude-code:hover {
+  color: #ff8c00;
+}
