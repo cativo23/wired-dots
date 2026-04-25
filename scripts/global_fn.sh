@@ -374,3 +374,51 @@ detect_aur_helper() {
     export AUR_HELPER="yay"
     printf 'yay\n'
 }
+
+# symlink_safe <src> <dst>
+# Creates symlink dst → src. Handles conflicts via ON_CONFLICT env var:
+#   overwrite — remove existing dst, replace with symlink
+#   skip      — leave existing dst in place, return 0
+#   abort     — return 1 immediately
+#   (default interactive: 10s timed prompt)
+symlink_safe() {
+    local src="$1" dst="$2"
+    local conflict="${ON_CONFLICT:-}"
+
+    if [[ -e "$dst" || -L "$dst" ]]; then
+        if [[ -z "$conflict" ]]; then
+            local choice
+            choice="$(prompt_timer 10 "Conflict at $dst — [o]verwrite/[s]kip/[a]bort?" "s")"
+            case "${choice,,}" in
+                o*) conflict="overwrite" ;;
+                a*) conflict="abort" ;;
+                *)  conflict="skip" ;;
+            esac
+        fi
+        case "$conflict" in
+            overwrite)
+                if [[ "${DRY_RUN:-0}" != "1" ]]; then
+                    rm -rf "$dst"
+                fi
+                log_warn "overwriting: $dst"
+                ;;
+            skip)
+                log_skip "skipping existing: $dst"
+                return 0
+                ;;
+            abort)
+                log_err "conflict at $dst — aborting"
+                return 1
+                ;;
+        esac
+    fi
+
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would symlink: $dst → $src"
+        return 0
+    fi
+
+    mkdir -p "$(dirname "$dst")"
+    ln -sfn "$src" "$dst"
+    log_ok "linked: $dst → $src"
+}
