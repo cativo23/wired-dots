@@ -44,12 +44,12 @@ draw_box() {
     local title="$1" content="$2" duration="${3:-}"
     local width=62
     local top_line
-    printf -v top_line '╭─ phase · %s ' "$title"
+    printf -v top_line '╭─ phase %s ' "$title"
     local pad=$(( width - ${#top_line} - 1 ))
     [[ $pad -lt 2 ]] && pad=2
-    printf '%b%s%*s╮%b\n' "$WIRED_COLOR_BLUE" "$top_line" "$pad" '─' "$WIRED_COLOR_RESET"
+    printf '%b%s%*s╮%b\n' "$WIRED_COLOR_BLUE" "$top_line" "$(( pad + 2 ))" '─' "$WIRED_COLOR_RESET"
     while IFS= read -r line; do
-        local inner_pad=$(( width - ${#line} - 1 ))
+        local inner_pad=$(( width - ${#line} - 4 ))
         [[ $inner_pad -lt 0 ]] && inner_pad=0
         printf '%b│%b  %s%*s%b│%b\n' \
             "$WIRED_COLOR_BLUE" "$WIRED_COLOR_RESET" \
@@ -57,9 +57,9 @@ draw_box() {
             "$WIRED_COLOR_BLUE" "$WIRED_COLOR_RESET"
     done <<< "$content"
     if [[ -n "$duration" ]]; then
-        local dur_pad=$(( width - ${#duration} - 1 ))
+        local dur_pad=$(( width - ${#duration} - 5 ))
         [[ $dur_pad -lt 2 ]] && dur_pad=2
-        printf '%b╰%*s %s %b─╯%b\n' "$WIRED_COLOR_BLUE" "$dur_pad" '─' "$duration" "$WIRED_COLOR_MUTED" "$WIRED_COLOR_RESET"
+        printf '%b╰%*s %s %b─╯%b\n' "$WIRED_COLOR_BLUE" "$(( dur_pad + 2 ))" '─' "$duration" "$WIRED_COLOR_MUTED" "$WIRED_COLOR_RESET"
     else
         printf '%b╰%*s╯%b\n' "$WIRED_COLOR_BLUE" "$(( width ))" '─' "$WIRED_COLOR_RESET"
     fi
