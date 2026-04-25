@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RC fixes: conditional display manager verification (DISPLAY_MANAGER-aware), correct Intel VA-API driver selection per GPU generation, legacy NVIDIA documentation (NVIDIA-LEGACY.md)
 
 ### Fixed
+- **Critical**: orchestrator now re-runs detection in its own shell scope after the 02/04a phases. `run_phase` execs phase scripts as subprocesses, so `WIFI_MODULE`, `BOOTLOADER`, `GPU_TYPE`, `GPU_CMDLINE`, and `KERNELS` exports were lost — causing WiFi setup and bootloader patching to silently skip on real installs
+- `--gpu=` overrides now propagate correctly through dry-run routing
 - `networkmanager` package name corrected (was `NetworkManager`) in verification
 - `02_detect.sh` detect_phase no longer runs as sourcing side-effect
 - Removed duplicate service enable from `08_sddm.sh`/`08_greetd.sh` (owned by `10a`)
