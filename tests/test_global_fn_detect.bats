@@ -58,12 +58,14 @@ setup() {
 }
 
 @test "detect_kernels returns at least one kernel" {
+    [ -d /boot ] && compgen -G "/boot/vmlinuz-*" >/dev/null || skip "no /boot/vmlinuz-* present (non-Arch CI)"
     run detect_kernels
     [ "$status" -eq 0 ]
     [[ -n "$output" ]]
 }
 
 @test "detect_aur_helper returns paru or yay" {
+    command -v paru >/dev/null 2>&1 || command -v yay >/dev/null 2>&1 || skip "no AUR helper installed (non-Arch CI)"
     run detect_aur_helper
     [ "$status" -eq 0 ]
     [[ "$output" == "paru" || "$output" == "yay" ]]

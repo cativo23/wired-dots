@@ -39,13 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Phase 10b: XDG desktop portal restart after config deploy
 - Phase 10c: post-install verification with summary box
 - 118 bats unit tests covering all phase scripts and global helpers
+- Initial repo scaffolding (M0): directory structure, docs skeletons, CI workflows, placeholder entry scripts.
 
 ### Changed
 
 - VERSION bumped to 0.3.0-dev
-
-### Added
-
-- Initial repo scaffolding (M0): directory structure, docs skeletons, CI workflows, placeholder entry scripts.
 
 [Unreleased]: https://github.com/cativo23/wired-dots/compare/HEAD
