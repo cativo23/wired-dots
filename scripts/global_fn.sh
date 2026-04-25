@@ -304,7 +304,7 @@ detect_wifi() {
 
 # detect_battery — returns 0 if battery present, 1 if desktop/no battery
 detect_battery() {
-    if ls /sys/class/power_supply/BAT* &>/dev/null; then
+    if compgen -G "/sys/class/power_supply/BAT*" > /dev/null 2>&1; then
         export HAS_BATTERY=1
         return 0
     fi
@@ -330,7 +330,7 @@ detect_bootloader() {
     elif [[ -d /boot/loader && -f /boot/loader/loader.conf ]]; then
         result="systemd-boot"
     elif [[ -f /boot/refind_linux.conf ]] || \
-         find /boot/EFI -name "refind*.efi" &>/dev/null 2>&1; then
+         find /boot/EFI -name "refind*.efi" &>/dev/null; then
         result="refind"
     fi
     export BOOTLOADER="$result"

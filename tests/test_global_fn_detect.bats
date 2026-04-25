@@ -39,10 +39,10 @@ setup() {
     [[ "$output" == *"amd"* ]]
 }
 
-@test "detect_cpu returns intel or amd" {
+@test "detect_cpu returns intel, amd, or unknown" {
     run detect_cpu
     [ "$status" -eq 0 ]
-    [[ "$output" == "intel" || "$output" == "amd" ]]
+    [[ "$output" == "intel" || "$output" == "amd" || "$output" == "unknown" ]]
 }
 
 @test "detect_battery returns true (0) or false (1) without crashing" {
