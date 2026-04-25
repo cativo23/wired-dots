@@ -1,0 +1,29 @@
+name: arch-tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    steps:
+      - name: Initialize pacman keyring and install dependencies
+        run: |
+          pacman-key --init
+          pacman-key --populate archlinux
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm --needed bats shellcheck git
+
+      - uses: actions/checkout@v4
+
+      - name: Run bats tests on Arch
+        run: bats tests/
+
+      - name: Dry-run installer (smoke test)
+        run: |
+          # --gpu=intel forces deterministic routing; --no-* skip phases that need real sudo/services
+          bash scripts/install.sh --dry-run --gpu=intel --no-services --no-bootloader --no-display-manager
