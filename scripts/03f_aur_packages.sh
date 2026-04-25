@@ -1,8 +1,31 @@
 #!/usr/bin/env bash
-# wired-dots — phase: 03f_aur_packages
-# Stub. Real implementation lands in a later milestone.
-
+# wired-dots — phase 03f: AUR packages
 set -euo pipefail
 
-echo "wired-dots: phase 03f_aur_packages is not implemented yet (M0 scaffolding)." >&2
-exit 64
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPTS_DIR/.." && pwd)"
+export REPO_ROOT SCRIPTS_DIR
+# shellcheck source=scripts/global_fn.sh
+source "$SCRIPTS_DIR/global_fn.sh"
+
+main() {
+    log_step "03f" "AUR packages"
+
+    if [[ -z "${AUR_HELPER:-}" ]]; then
+        detect_aur_helper
+    fi
+
+    local pkgs_raw=()
+    while IFS= read -r line; do
+        line="${line%%#*}"
+        line="${line#"${line%%[![:space:]]*}"}"
+        line="${line%"${line##*[![:space:]]}"}"
+        [[ -z "$line" ]] && continue
+        pkgs_raw+=("${line%% *}")
+    done < "$REPO_ROOT/source/packages/aur.lst"
+
+    install_packages pkgs_raw "${AUR_HELPER:-yay}" "-S" "--needed" "--noconfirm"
+    log_ok "AUR packages complete"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then main; fi
