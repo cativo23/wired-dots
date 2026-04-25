@@ -177,6 +177,16 @@ run_phases() {
     run_phase "01_backup.sh"      "01 · backup"
     run_phase "02_detect.sh"      "02 · detect"
 
+    # Re-run detection in orchestrator scope so detected values propagate to
+    # subsequent phase routing (run_phase forks a subprocess; child exports are lost).
+    detect_cpu        >/dev/null 2>&1 || true
+    detect_gpu        >/dev/null 2>&1 || true
+    detect_wifi       >/dev/null 2>&1 || true
+    detect_battery    >/dev/null 2>&1 || true
+    detect_bootloader >/dev/null 2>&1 || true
+    detect_kernels    >/dev/null 2>&1 || true
+    [[ -z "${AUR_HELPER:-}" ]] && detect_aur_helper >/dev/null 2>&1 || true
+
     if [[ "$NO_PACKAGES" != "1" ]]; then
         run_phase "03a_pacman_tweaks.sh" "03a · pacman tweaks"
         run_phase "03b_core_packages.sh" "03b · core packages"
@@ -190,9 +200,11 @@ run_phases() {
 
     if [[ "$NO_GPU" != "1" ]]; then
         run_phase "04a_gpu_detect.sh" "04a · GPU detect"
-        # Propagate override (in dry-run, run_phase doesn't execute the script, so do it here)
-        if [[ -n "${GPU_OVERRIDE:-}" && -z "${GPU_TYPE:-}" ]]; then
-            GPU_TYPE="$GPU_OVERRIDE"
+        # Propagate override / re-detect for routing (subprocess exports are lost)
+        if [[ -n "${GPU_OVERRIDE:-}" ]]; then
+            GPU_TYPE="${GPU_TYPE:-$GPU_OVERRIDE}"
+        elif [[ -z "${GPU_TYPE:-}" ]]; then
+            detect_gpu >/dev/null 2>&1 || true
         fi
         case "${GPU_TYPE:-unknown}" in
             nvidia*) run_phase "04b_gpu_nvidia.sh" "04b · GPU NVIDIA" ;;
