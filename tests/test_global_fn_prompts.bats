@@ -27,3 +27,14 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" == "n" ]]
 }
+
+@test "require_sudo short-circuits in DRY_RUN mode" {
+    DRY_RUN=1 run require_sudo
+    [ "$status" -eq 0 ]
+}
+
+@test "stop_sudo_keepalive cleans up without error when no keepalive running" {
+    unset SUDO_KEEPALIVE_PID
+    run stop_sudo_keepalive
+    [ "$status" -eq 0 ]
+}

@@ -110,3 +110,37 @@ confirm() {
     answer="$(prompt_timer "$timeout" "$prompt" "$default")"
     [[ "${answer,,}" == "y"* ]]
 }
+
+# start_sudo_keepalive — refreshes sudo every 60s in background.
+# Registers EXIT/INT/TERM/ERR trap to stop on exit.
+start_sudo_keepalive() {
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then return 0; fi
+    sudo -v
+    ( while true; do sudo -n true; sleep 60; done ) &
+    SUDO_KEEPALIVE_PID=$!
+    export SUDO_KEEPALIVE_PID
+    # shellcheck disable=SC2064
+    trap "stop_sudo_keepalive" EXIT INT TERM ERR
+}
+
+stop_sudo_keepalive() {
+    if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then
+        kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+        unset SUDO_KEEPALIVE_PID
+    fi
+}
+
+# require_sudo — validates sudo access, starts keepalive.
+# Idempotent: no-op if keepalive already running.
+require_sudo() {
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would require sudo"
+        return 0
+    fi
+    if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then return 0; fi
+    if ! sudo -v; then
+        log_err "sudo authentication failed"
+        exit 2
+    fi
+    start_sudo_keepalive
+}
