@@ -10,16 +10,16 @@ source "$SCRIPTS_DIR/global_fn.sh"
 
 PACMAN_CONF="/etc/pacman.conf"
 
-PACMAN_PATCH="
-# --- wired-dots tweaks (do not edit below this line) ---
+PACMAN_PATCH="# --- wired-dots tweaks (do not edit below this line) ---
 Color
 ILoveCandy
 ParallelDownloads = 5
 # --- end wired-dots tweaks ---"
 
 patch_pacman_conf() {
-    local state
-    sentinel_check "$PACMAN_CONF"; state=$?
+    local state=0
+    # Capture exit code safely under set -e: sentinel_check returns 1 or 2 on non-applied states
+    sentinel_check "$PACMAN_CONF" && state=0 || state=$?
     case $state in
         0) log_skip "pacman.conf already patched (sentinel ok)" ;;
         1) log_warn "pacman.conf changed since last apply — re-patching"
@@ -40,6 +40,10 @@ install_pacman_hooks() {
     sudo mkdir -p "$hooks_dir"
 
     if [[ "${GPU_TYPE:-unknown}" == nvidia* || "${GPU_TYPE:-unknown}" == hybrid* ]]; then
+        if [[ ! -f "$hook_src" ]]; then
+            log_warn "nvidia.hook not found at $hook_src — skipping"
+            return 0
+        fi
         sudo cp "$hook_src" "$hooks_dir/nvidia.hook"
         log_ok "installed nvidia pacman hook → $hooks_dir/nvidia.hook"
     else
