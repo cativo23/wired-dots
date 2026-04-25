@@ -8,6 +8,7 @@ export REPO_ROOT SCRIPTS_DIR
 # shellcheck source=scripts/global_fn.sh
 source "$SCRIPTS_DIR/global_fn.sh"
 
+# shellcheck disable=SC2034  # passed to install_packages by nameref
 BT_PACKAGES=( bluez bluez-utils )
 BT_ASSET="$REPO_ROOT/source/assets/bluez/main.conf.d/wired.conf"
 BT_CONF_DIR="/etc/bluetooth/main.conf.d"

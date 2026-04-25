@@ -77,7 +77,7 @@ link_bin_files() {
     done < <(find "$bin_src" -maxdepth 1 \( -type f -o -type l \) -print0)
 
     if ! printf '%s' "${PATH:-}" | grep -q "$HOME/.local/bin"; then
-        log_warn "~/.local/bin is not in PATH — add it to your shell config (handled by ~/.config/zsh/)"
+        log_warn "$HOME/.local/bin is not in PATH — add it to your shell config (handled by ~/.config/zsh/)"
     fi
 }
 

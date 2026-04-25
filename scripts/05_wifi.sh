@@ -29,6 +29,7 @@ handle_wifi() {
                 if [[ -z "${AUR_HELPER:-}" ]]; then
                     detect_aur_helper
                 fi
+                # shellcheck disable=SC2034  # passed to install_packages by nameref
                 local pkgs=("$RTL8821CE_AUR_PKG")
                 install_packages pkgs "${AUR_HELPER:-yay}" "-S" "--needed" "--noconfirm"
             else

@@ -8,6 +8,7 @@ export REPO_ROOT SCRIPTS_DIR
 # shellcheck source=scripts/global_fn.sh
 source "$SCRIPTS_DIR/global_fn.sh"
 
+# shellcheck disable=SC2034  # passed to install_packages by nameref
 AUDIO_PACKAGES=(
     pipewire
     pipewire-alsa

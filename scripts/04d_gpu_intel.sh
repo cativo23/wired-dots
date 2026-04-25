@@ -14,11 +14,13 @@ main() {
     case "${GPU_TYPE:-intel-xe-arc}" in
         intel-legacy-i965)
             # Pre-Gen 9 (Haswell and older): use legacy VA-API driver
+            # shellcheck disable=SC2034  # passed to install_packages by nameref
             local pkgs=( vulkan-intel libva-intel-driver )
             install_packages pkgs "sudo" "pacman" "-S" "--needed" "--noconfirm"
             ;;
         *)
             # Gen 9+ (Broadwell, Skylake, Ice Lake, Xe, Arc): use modern driver
+            # shellcheck disable=SC2034  # passed to install_packages by nameref
             local pkgs=( vulkan-intel intel-media-driver )
             install_packages pkgs "sudo" "pacman" "-S" "--needed" "--noconfirm"
             ;;

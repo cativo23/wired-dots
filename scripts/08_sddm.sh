@@ -8,6 +8,7 @@ export REPO_ROOT SCRIPTS_DIR
 # shellcheck source=scripts/global_fn.sh
 source "$SCRIPTS_DIR/global_fn.sh"
 
+# shellcheck disable=SC2034  # passed to install_packages by nameref
 SDDM_PACKAGES=( sddm )
 SDDM_CONF_DIR="/etc/sddm.conf.d"
 SDDM_CONF_FILE="$SDDM_CONF_DIR/wired.conf"
