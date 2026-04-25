@@ -1,0 +1,13 @@
+{
+  "custom/mediaplayer": {
+    "exec": "playerctl metadata --format '{{ artist }} — {{ title }}' 2>/dev/null || echo ''",
+    "exec-if": "command -v playerctl >/dev/null 2>&1",
+    "format": "{}",
+    "interval": 2,
+    "max-length": 30,
+    "escape": true,
+    "on-click": "playerctl play-pause",
+    "tooltip": true,
+    "tooltip-format": "{}"
+  }
+}

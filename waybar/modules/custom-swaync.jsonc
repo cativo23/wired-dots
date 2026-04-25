@@ -1,0 +1,22 @@
+{
+  "custom/swaync": {
+    "exec": "swaync-client -swb 2>/dev/null",
+    "exec-if": "command -v swaync-client >/dev/null 2>&1",
+    "return-type": "json",
+    "format": "{icon} {}",
+    "format-icons": {
+      "notification": "󱅫",
+      "none": "󰂚",
+      "dnd-notification": "󰂛",
+      "dnd-none": "󰂛",
+      "inhibited-notification": "󱏨",
+      "inhibited-none": "󱏨",
+      "dnd-inhibited-notification": "󱏨",
+      "dnd-inhibited-none": "󱏨"
+    },
+    "escape": true,
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "tooltip": true
+  }
+}

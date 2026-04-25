@@ -1,0 +1,8 @@
+{
+  "custom/mediaplayer-previous": {
+    "format": "󰒮",
+    "on-click": "playerctl previous",
+    "tooltip": false,
+    "interval": "once"
+  }
+}

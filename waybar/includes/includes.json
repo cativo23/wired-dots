@@ -6,6 +6,13 @@
         "$XDG_CONFIG_HOME/waybar/modules/network.jsonc",
         "$XDG_CONFIG_HOME/waybar/modules/custom-uptime.jsonc",
         "$XDG_CONFIG_HOME/waybar/modules/custom-hyprsunset.jsonc",
-        "$XDG_CONFIG_HOME/waybar/modules/custom-power-profile.jsonc"
+        "$XDG_CONFIG_HOME/waybar/modules/custom-power-profile.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-gpuinfo.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-mediaplayer.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-mediaplayer-previous.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-mediaplayer-play-pause.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-mediaplayer-next.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-swaync.jsonc",
+        "$XDG_CONFIG_HOME/waybar/modules/custom-power.jsonc"
     ]
 }

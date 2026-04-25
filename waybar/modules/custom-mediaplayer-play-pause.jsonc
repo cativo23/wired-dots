@@ -1,0 +1,10 @@
+{
+  "custom/mediaplayer-play-pause": {
+    "exec": "status=$(playerctl status 2>/dev/null); if [ \"$status\" = \"Playing\" ]; then echo '󰏤'; else echo '󰐊'; fi",
+    "exec-if": "command -v playerctl >/dev/null 2>&1",
+    "format": "{}",
+    "interval": 2,
+    "on-click": "playerctl play-pause",
+    "tooltip": false
+  }
+}
