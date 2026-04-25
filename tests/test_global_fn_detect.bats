@@ -58,7 +58,7 @@ setup() {
 }
 
 @test "detect_kernels returns at least one kernel" {
-    [ -d /boot ] && compgen -G "/boot/vmlinuz-*" >/dev/null || skip "no /boot/vmlinuz-* present (non-Arch CI)"
+    compgen -G "/usr/lib/modules/*/pkgbase" >/dev/null || skip "no /usr/lib/modules/*/pkgbase (non-Arch CI)"
     run detect_kernels
     [ "$status" -eq 0 ]
     [[ -n "$output" ]]
