@@ -23,7 +23,8 @@ yay -S nvidia-390xx-dkms nvidia-390xx-utils nvidia-390xx-settings
 ```
 
 After installing, add these kernel params to your bootloader:
-```
+
+```text
 nvidia_drm.modeset=1
 ```
 

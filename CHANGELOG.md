@@ -10,9 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0-rc1] — 2026-04-24
 
 ### Added
+
 - RC fixes: conditional display manager verification (DISPLAY_MANAGER-aware), correct Intel VA-API driver selection per GPU generation, legacy NVIDIA documentation (NVIDIA-LEGACY.md)
 
 ### Fixed
+
 - **Critical**: orchestrator now re-runs detection in its own shell scope after the 02/04a phases. `run_phase` execs phase scripts as subprocesses, so `WIFI_MODULE`, `BOOTLOADER`, `GPU_TYPE`, `GPU_CMDLINE`, and `KERNELS` exports were lost — causing WiFi setup and bootloader patching to silently skip on real installs
 - `--gpu=` overrides now propagate correctly through dry-run routing
 - `networkmanager` package name corrected (was `NetworkManager`) in verification
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0-dev] — 2026-04-24
 
 ### Added
+
 - Phase 01: timestamped config backup before symlinking
 - Phase 03a: idempotent pacman.conf patch (Color, ILoveCandy, ParallelDownloads) + NVIDIA pacman hook
 - Phase 03b–03f: package installers for core, pipewire audio, fonts, bluez bluetooth, and AUR packages
@@ -38,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 118 bats unit tests covering all phase scripts and global helpers
 
 ### Changed
+
 - VERSION bumped to 0.3.0-dev
 
 ### Added
