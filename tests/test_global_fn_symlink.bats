@@ -20,14 +20,23 @@ teardown() {
     [ -L "$dst" ]
 }
 
-@test "symlink_safe overwrites existing file when ON_CONFLICT=overwrite" {
+@test "symlink_safe overwrites existing symlink when ON_CONFLICT=overwrite" {
     local src="$TEST_TMP/source_dir"
-    local dst="$TEST_TMP/existing"
+    local dst="$TEST_TMP/existing_link"
     mkdir -p "$src"
-    mkdir -p "$dst"
+    ln -s "$src" "$dst"  # create an existing symlink
     NONINTERACTIVE=1 ON_CONFLICT=overwrite run symlink_safe "$src" "$dst"
     [ "$status" -eq 0 ]
     [ -L "$dst" ]
+}
+
+@test "symlink_safe refuses to rm -rf real directory when ON_CONFLICT=overwrite" {
+    local src="$TEST_TMP/source_dir"
+    local dst="$TEST_TMP/existing_dir"
+    mkdir -p "$src"
+    mkdir -p "$dst"
+    NONINTERACTIVE=1 ON_CONFLICT=overwrite run symlink_safe "$src" "$dst"
+    [ "$status" -eq 1 ]
 }
 
 @test "symlink_safe skips when ON_CONFLICT=skip" {

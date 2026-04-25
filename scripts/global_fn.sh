@@ -398,7 +398,12 @@ symlink_safe() {
         case "$conflict" in
             overwrite)
                 if [[ "${DRY_RUN:-0}" != "1" ]]; then
-                    rm -rf "$dst"
+                    if [[ -L "$dst" || -f "$dst" ]]; then
+                        rm "$dst"
+                    elif [[ -d "$dst" ]]; then
+                        log_err "refusing to remove real directory: $dst (use ON_CONFLICT=skip or remove manually)"
+                        return 1
+                    fi
                 fi
                 log_warn "overwriting: $dst"
                 ;;
