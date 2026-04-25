@@ -29,19 +29,10 @@ write_greetd_conf() {
     log_ok "greetd config written → $GREETD_CONF_FILE"
 }
 
-enable_greetd() {
-    if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would enable greetd.service"
-        return 0
-    fi
-    sudo systemctl enable greetd.service && log_ok "greetd.service enabled" || log_warn "greetd.service enable failed"
-}
-
 main() {
     log_step "08" "display manager (greetd)"
     install_packages GREETD_PACKAGES "sudo" "pacman" "-S" "--needed" "--noconfirm"
     write_greetd_conf
-    enable_greetd
     log_ok "greetd setup complete"
 }
 

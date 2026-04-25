@@ -31,19 +31,10 @@ write_sddm_conf() {
     log_ok "SDDM config written → $SDDM_CONF_FILE"
 }
 
-enable_sddm() {
-    if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would enable sddm.service"
-        return 0
-    fi
-    sudo systemctl enable sddm.service && log_ok "sddm.service enabled" || log_warn "sddm.service enable failed"
-}
-
 main() {
     log_step "08" "display manager (sddm)"
     install_packages SDDM_PACKAGES "sudo" "pacman" "-S" "--needed" "--noconfirm"
     write_sddm_conf
-    enable_sddm
     log_ok "SDDM setup complete"
 }
 
