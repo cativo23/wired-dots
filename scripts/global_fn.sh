@@ -274,3 +274,103 @@ detect_gpu() {
     printf '%s\n' "$GPU_TYPE"
     return 0
 }
+
+# detect_cpu — returns "intel" or "amd"
+detect_cpu() {
+    local vendor
+    vendor="$(lscpu 2>/dev/null | awk '/^Vendor ID:/ {print tolower($3)}')"
+    case "$vendor" in
+        *genuineintel*|*intel*) export CPU_VENDOR="intel"; printf 'intel\n'; return 0 ;;
+        *authenticamd*|*amd*)   export CPU_VENDOR="amd";   printf 'amd\n';   return 0 ;;
+        *)
+            if grep -qi "intel" /proc/cpuinfo 2>/dev/null; then
+                export CPU_VENDOR="intel"; printf 'intel\n'
+            elif grep -qi "amd" /proc/cpuinfo 2>/dev/null; then
+                export CPU_VENDOR="amd"; printf 'amd\n'
+            else
+                export CPU_VENDOR="unknown"; printf 'unknown\n'
+            fi
+            ;;
+    esac
+}
+
+# detect_wifi — returns kernel module name or "none"
+detect_wifi() {
+    local module
+    module="$(lspci -v 2>/dev/null | awk '/Network controller/{found=1} found && /Kernel driver/{print $NF; found=0; exit}')"
+    export WIFI_MODULE="${module:-none}"
+    printf '%s\n' "${module:-none}"
+}
+
+# detect_battery — returns 0 if battery present, 1 if desktop/no battery
+detect_battery() {
+    if ls /sys/class/power_supply/BAT* &>/dev/null; then
+        export HAS_BATTERY=1
+        return 0
+    fi
+    export HAS_BATTERY=0
+    return 1
+}
+
+# detect_bluetooth — returns 0 if BT hardware present, 1 if not
+detect_bluetooth() {
+    if lsusb 2>/dev/null | grep -qi "bluetooth" || hciconfig 2>/dev/null | grep -q "hci"; then
+        export HAS_BLUETOOTH=1
+        return 0
+    fi
+    export HAS_BLUETOOTH=0
+    return 1
+}
+
+# detect_bootloader — returns grub | systemd-boot | refind | unknown
+detect_bootloader() {
+    local result="unknown"
+    if [[ -d /boot/grub && -f /boot/grub/grub.cfg ]]; then
+        result="grub"
+    elif [[ -d /boot/loader && -f /boot/loader/loader.conf ]]; then
+        result="systemd-boot"
+    elif [[ -f /boot/refind_linux.conf ]] || \
+         find /boot/EFI -name "refind*.efi" &>/dev/null 2>&1; then
+        result="refind"
+    fi
+    export BOOTLOADER="$result"
+    printf '%s\n' "$result"
+}
+
+# detect_kernels — list of installed kernel pkgbase names
+detect_kernels() {
+    local kernels=()
+    for dir in /usr/lib/modules/*/pkgbase; do
+        [[ -f "$dir" ]] && kernels+=("$(cat "$dir")")
+    done
+    export KERNELS=("${kernels[@]}")
+    printf '%s\n' "${kernels[@]}"
+}
+
+# detect_aur_helper — returns paru | yay, bootstraps yay if neither found
+detect_aur_helper() {
+    if command -v paru &>/dev/null; then
+        export AUR_HELPER="paru"
+        printf 'paru\n'
+        return 0
+    fi
+    if command -v yay &>/dev/null; then
+        export AUR_HELPER="yay"
+        printf 'yay\n'
+        return 0
+    fi
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_warn "[dry-run] no AUR helper found; would bootstrap yay"
+        export AUR_HELPER="yay"
+        printf 'yay\n'
+        return 0
+    fi
+    log_warn "No AUR helper found — bootstrapping yay..."
+    local tmpdir
+    tmpdir="$(mktemp -d)"
+    git clone --depth=1 https://aur.archlinux.org/yay.git "$tmpdir/yay"
+    ( cd "$tmpdir/yay" && makepkg -si --noconfirm )
+    rm -rf "$tmpdir"
+    export AUR_HELPER="yay"
+    printf 'yay\n'
+}
