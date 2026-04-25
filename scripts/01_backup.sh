@@ -18,7 +18,8 @@ BACKUP_CONFIG_DIRS=(
 BACKUP_DOTFILES=( .zshenv .gtkrc-2.0 )
 
 backup_configs() {
-    local backup_base="${HOME}/.local/share/wired-dots/backups/${WIRED_LOG}"
+    local wired_log="${WIRED_LOG:-$(date +%Y%m%dT%H%M%S)}"
+    local backup_base="${HOME}/.local/share/wired-dots/backups/${wired_log}"
 
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
         log_info "[dry-run] would backup configs to: $backup_base"
