@@ -19,7 +19,7 @@
 [![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-5046e4?style=flat)](https://hyprland.org/)
 [![ShellCheck](https://img.shields.io/badge/shellcheck-passing-brightgreen?style=flat)](https://github.com/cativo23/wired-dots/actions)
 
-> **Status:** v0.1.0-dev — scaffolding. Not installable yet. See [Roadmap](#roadmap).
+> **Status:** v0.3.0-dev — installer complete, approaching v1.0.0-rc1
 
 </div>
 
@@ -32,7 +32,6 @@ _Screenshots land here once the installer deploys a working desktop._
 ## Quick Start
 
 ```bash
-# NOT YET FUNCTIONAL — pending M2+
 git clone https://github.com/cativo23/wired-dots.git ~/wired-dots
 cd ~/wired-dots
 ./install.sh
@@ -94,11 +93,12 @@ See [docs/troubleshooting.md](docs/troubleshooting.md).
 
 | Milestone | Scope | Status |
 |---|---|---|
-| M0 | Repo scaffolding, CI green on empty repo | ⏳ in progress |
-| M1 | Configs migration + net-new configs | ⬜ pending |
-| M2 | Installer skeleton (preflight, detect, `--dry-run`) | ⬜ pending |
-| M3 | Core phases (packages, audio, fonts, symlinks, theme, services) | ⬜ pending |
-| M4 | Hardware paths (GPU/WiFi/bootloader/DM) + v1.0 release | ⬜ pending |
+| M0 | Repo scaffolding, CI green on empty repo | ✅ complete |
+| M1 | Configs migration + net-new configs | ✅ complete |
+| M2 | Installer skeleton (preflight, detect, `--dry-run`) | ✅ complete |
+| M3 | Core phases (packages, audio, fonts, symlinks, theme, services) | ✅ complete |
+| M4 | Config corpus | 🔲 in progress |
+| RC | v1.0.0-rc1 release candidate | 🔲 pending |
 
 ## Contributing
 
