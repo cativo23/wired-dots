@@ -89,13 +89,14 @@ prompt_timer() {
         return 0
     fi
     local answer=""
+    # Display goes to stderr so $() capture in confirm() only gets the answer
     printf '%b%s [%s] (auto in %ss): %b' \
-        "$WIRED_COLOR_YELLOW" "$msg" "$default" "$timeout" "$WIRED_COLOR_RESET"
+        "$WIRED_COLOR_YELLOW" "$msg" "$default" "$timeout" "$WIRED_COLOR_RESET" >&2
     if read -rt "$timeout" -n 1 answer; then
-        printf '\n'
+        printf '\n' >&2
         answer="${answer:-$default}"
     else
-        printf '\n'
+        printf '\n' >&2
         answer="$default"
     fi
     printf '%s\n' "${answer,,}"
