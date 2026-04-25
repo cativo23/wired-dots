@@ -144,3 +144,22 @@ require_sudo() {
     fi
     start_sudo_keepalive
 }
+
+# pkg_installed <name> — returns 0 if package is installed locally.
+pkg_installed() { pacman -Q "$1" &>/dev/null; }
+
+# pkg_available <name> — returns 0 if in pacman sync DB.
+pkg_available() {
+    [[ -f /var/lib/pacman/sync/core.db ]] || return 2
+    pacman -Ss "^${1}$" &>/dev/null
+}
+
+# aur_available <name> — returns 0 if in AUR (requires AUR helper).
+aur_available() {
+    local helper="${AUR_HELPER:-}"
+    if [[ -z "$helper" ]]; then
+        helper="$(command -v paru || command -v yay || true)"
+    fi
+    [[ -n "$helper" ]] || return 2
+    "$helper" -Ss "^${1}$" &>/dev/null
+}
