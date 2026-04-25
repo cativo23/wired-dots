@@ -11,16 +11,19 @@ source "$SCRIPTS_DIR/global_fn.sh"
 main() {
     log_step "04d" "GPU Intel (${GPU_TYPE:-intel-xe-arc})"
 
-    local pkgs_raw=()
-    while IFS= read -r line; do
-        line="${line%%#*}"
-        line="${line#"${line%%[![:space:]]*}"}"
-        line="${line%"${line##*[![:space:]]}"}"
-        [[ -z "$line" ]] && continue
-        pkgs_raw+=("${line%% *}")
-    done < "$REPO_ROOT/source/packages/gpu-intel.lst"
+    case "${GPU_TYPE:-intel-xe-arc}" in
+        intel-legacy-i965)
+            # Pre-Gen 9 (Haswell and older): use legacy VA-API driver
+            local pkgs=( vulkan-intel libva-intel-driver )
+            install_packages pkgs "sudo" "pacman" "-S" "--needed" "--noconfirm"
+            ;;
+        *)
+            # Gen 9+ (Broadwell, Skylake, Ice Lake, Xe, Arc): use modern driver
+            local pkgs=( vulkan-intel intel-media-driver )
+            install_packages pkgs "sudo" "pacman" "-S" "--needed" "--noconfirm"
+            ;;
+    esac
 
-    install_packages pkgs_raw "sudo" "pacman" "-S" "--needed" "--noconfirm"
     log_ok "Intel GPU setup complete"
 }
 
