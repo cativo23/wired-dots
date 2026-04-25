@@ -97,7 +97,7 @@ refresh_keyring() {
 
 add_user_groups() {
     local groups=("video" "input" "seat" "i2c" "audio")
-    local user="${SUDO_USER:-$USER}"
+    local user="${SUDO_USER:-${USER:-$(id -un)}}"
     for grp in "${groups[@]}"; do
         if getent group "$grp" &>/dev/null; then
             if [[ "${DRY_RUN:-0}" == "1" ]]; then
@@ -107,6 +107,7 @@ add_user_groups() {
             fi
         fi
     done
+    return 0
 }
 
 print_banner() {
