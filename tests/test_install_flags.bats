@@ -35,10 +35,10 @@ SCRIPT="$(cd "$(dirname "$BATS_TEST_DIRNAME")" && pwd)/scripts/install.sh"
     [ "$status" -eq 1 ]
 }
 
-@test "--dry-run --no-packages --no-gpu --no-wifi --no-bootloader --no-display-manager --no-services exits 0 or 2" {
+@test "--dry-run with all --no-* flags exits 0" {
     run timeout 10 "$SCRIPT" --dry-run --no-packages --no-gpu --no-wifi \
         --no-bootloader --no-display-manager --no-services
-    [[ "$status" -eq 0 || "$status" -eq 2 ]]
+    [ "$status" -eq 0 ]
 }
 
 @test "log directory test: --help exits cleanly" {

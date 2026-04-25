@@ -125,7 +125,7 @@ EOF
 }
 
 print_version() {
-    cat "$REPO_ROOT/VERSION" 2>/dev/null || printf 'unknown\n'
+    cat "$REPO_ROOT/VERSION" 2>/dev/null || printf '%s\n' "${WIRED_DOTS_VERSION:-unknown}"
 }
 
 # ── Log directory setup ───────────────────────────────────────────────────────
