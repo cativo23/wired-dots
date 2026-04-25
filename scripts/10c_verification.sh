@@ -14,10 +14,11 @@ VERIFY_PACKAGES=(
     waybar
     pipewire
     wireplumber
-    sddm
     networkmanager
     bash
 )
+# Add display manager package only if one was selected
+[[ "${DISPLAY_MANAGER:-sddm}" != "none" ]] && VERIFY_PACKAGES+=( "${DISPLAY_MANAGER:-sddm}" )
 
 VERIFY_SYMLINKS=(
     "$HOME/.config/hypr"

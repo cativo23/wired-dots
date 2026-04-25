@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc1] — 2026-04-24
+
+### Added
+- RC fixes: conditional display manager verification (DISPLAY_MANAGER-aware), correct Intel VA-API driver selection per GPU generation, legacy NVIDIA documentation (NVIDIA-LEGACY.md)
+
+### Fixed
+- `networkmanager` package name corrected (was `NetworkManager`) in verification
+- `02_detect.sh` detect_phase no longer runs as sourcing side-effect
+- Removed duplicate service enable from `08_sddm.sh`/`08_greetd.sh` (owned by `10a`)
+- Removed `sddm` from `aur.lst` (official repo package)
+
 ## [0.3.0-dev] — 2026-04-24
 
 ### Added
