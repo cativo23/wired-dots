@@ -115,7 +115,7 @@ confirm() {
 # Registers EXIT/INT/TERM/ERR trap to stop on exit.
 start_sudo_keepalive() {
     if [[ "${DRY_RUN:-0}" == "1" ]]; then return 0; fi
-    sudo -v
+    # Caller must authenticate before invoking. Keepalive refreshes in background.
     ( while true; do sudo -n true; sleep 60; done ) &
     SUDO_KEEPALIVE_PID=$!
     export SUDO_KEEPALIVE_PID
@@ -149,10 +149,7 @@ require_sudo() {
 pkg_installed() { pacman -Q "$1" &>/dev/null; }
 
 # pkg_available <name> — returns 0 if in pacman sync DB.
-pkg_available() {
-    [[ -f /var/lib/pacman/sync/core.db ]] || return 2
-    pacman -Ss "^${1}$" &>/dev/null
-}
+pkg_available() { pacman -Si "$1" &>/dev/null; }
 
 # aur_available <name> — returns 0 if in AUR (requires AUR helper).
 aur_available() {
