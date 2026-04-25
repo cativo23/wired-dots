@@ -13,11 +13,12 @@ setup() {
     [[ "$status" -eq 0 || "$status" -eq 3 ]]
 }
 
-@test "detect_phase sets CPU_VENDOR when sourced" {
+@test "detect_cpu sets CPU_VENDOR" {
     run bash -c "
         export REPO_ROOT=\"$REPO_ROOT\"
+        export WIRED_LOG_FILE=/dev/null
         source \"$REPO_ROOT/scripts/global_fn.sh\"
-        source \"$REPO_ROOT/scripts/02_detect.sh\" 2>/dev/null || true
+        detect_cpu >/dev/null 2>&1 || true
         printf '%s\n' \"\${CPU_VENDOR:-unset}\"
     "
     [ "$status" -eq 0 ]
@@ -30,11 +31,11 @@ setup() {
     [ "$status" -eq 0 ]
 }
 
-@test "detect phase exports HAS_BATTERY" {
+@test "detect_battery exports HAS_BATTERY" {
     run bash -c "
         export REPO_ROOT=\"$REPO_ROOT\"
         source \"$REPO_ROOT/scripts/global_fn.sh\"
-        source \"$REPO_ROOT/scripts/02_detect.sh\" 2>/dev/null || true
+        detect_battery 2>/dev/null || true
         printf '%s\n' \"\${HAS_BATTERY:-unset}\"
     "
     [ "$status" -eq 0 ]
