@@ -36,3 +36,45 @@ log_err()  { print_log "$WIRED_COLOR_RED"    "✗" "$*"; }
 log_skip() { print_log "$WIRED_COLOR_MUTED"  "○" "$*"; }
 log_info() { print_log "$WIRED_COLOR_BLUE"   "ℹ" "$*"; }
 log_step() { print_log "$WIRED_COLOR_BLUE"   "▶" "$1 $2"; }
+
+# draw_box <title> <content_lines> <duration>
+# content_lines can be multi-line (use $'\n' separator).
+# duration: "3m 14s" or "" to omit elapsed time footer.
+draw_box() {
+    local title="$1" content="$2" duration="${3:-}"
+    local width=62
+    local top_line
+    printf -v top_line '╭─ phase · %s ' "$title"
+    local pad=$(( width - ${#top_line} - 1 ))
+    [[ $pad -lt 2 ]] && pad=2
+    printf '%b%s%*s╮%b\n' "$WIRED_COLOR_BLUE" "$top_line" "$pad" '─' "$WIRED_COLOR_RESET"
+    while IFS= read -r line; do
+        local inner_pad=$(( width - ${#line} - 1 ))
+        [[ $inner_pad -lt 0 ]] && inner_pad=0
+        printf '%b│%b  %s%*s%b│%b\n' \
+            "$WIRED_COLOR_BLUE" "$WIRED_COLOR_RESET" \
+            "$line" "$inner_pad" '' \
+            "$WIRED_COLOR_BLUE" "$WIRED_COLOR_RESET"
+    done <<< "$content"
+    if [[ -n "$duration" ]]; then
+        local dur_pad=$(( width - ${#duration} - 1 ))
+        [[ $dur_pad -lt 2 ]] && dur_pad=2
+        printf '%b╰%*s %s %b─╯%b\n' "$WIRED_COLOR_BLUE" "$dur_pad" '─' "$duration" "$WIRED_COLOR_MUTED" "$WIRED_COLOR_RESET"
+    else
+        printf '%b╰%*s╯%b\n' "$WIRED_COLOR_BLUE" "$(( width ))" '─' "$WIRED_COLOR_RESET"
+    fi
+}
+
+# spinner <pid> <message>
+# Shows braille animation until pid exits.
+spinner() {
+    local pid="$1" msg="$2"
+    local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+    local i=0
+    while kill -0 "$pid" 2>/dev/null; do
+        printf '\r%b%s%b %s' "$WIRED_COLOR_BLUE" "${frames[$i]}" "$WIRED_COLOR_RESET" "$msg"
+        i=$(( (i + 1) % ${#frames[@]} ))
+        sleep 0.1
+    done
+    printf '\r%*s\r' "$(( ${#msg} + 3 ))" ''
+}
