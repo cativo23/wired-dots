@@ -30,3 +30,32 @@ setup() {
     run pkg_available "wired-dots-definitely-not-a-real-package-xyz123"
     [ "$status" -eq 1 ]
 }
+
+@test "sentinel_check returns 2 (not applied) for file without .wired.bkp" {
+    local tmp
+    tmp="$(mktemp)"
+    printf 'some content\n' > "$tmp"
+    run sentinel_check "$tmp"
+    [ "$status" -eq 2 ]
+    rm -f "$tmp" "${tmp}.wired.bkp"
+}
+
+@test "sentinel_check returns 0 (already applied) when hash matches" {
+    local tmp
+    tmp="$(mktemp)"
+    printf 'patched content\n' > "$tmp"
+    sha256sum "$tmp" | awk '{print $1}' > "${tmp}.wired.bkp"
+    run sentinel_check "$tmp"
+    [ "$status" -eq 0 ]
+    rm -f "$tmp" "${tmp}.wired.bkp"
+}
+
+@test "sentinel_check returns 1 (drift) when file changed since last apply" {
+    local tmp
+    tmp="$(mktemp)"
+    printf 'original content\n' > "$tmp"
+    printf 'different-hash\n' > "${tmp}.wired.bkp"
+    run sentinel_check "$tmp"
+    [ "$status" -eq 1 ]
+    rm -f "$tmp" "${tmp}.wired.bkp"
+}

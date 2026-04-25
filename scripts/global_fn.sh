@@ -163,3 +163,51 @@ aur_available() {
     [[ -n "$helper" ]] || return 2
     "$helper" -Ss "^${1}$" &>/dev/null
 }
+
+# sentinel_check <file>
+# Returns:
+#   0 — patch already applied (hash matches .wired.bkp)
+#   1 — file drifted since last apply
+#   2 — never applied (no .wired.bkp)
+sentinel_check() {
+    local file="$1" sentinel="${1}.wired.bkp"
+    [[ -f "$sentinel" ]] || return 2
+    local current_hash saved_hash
+    current_hash="$(sha256sum "$file" | awk '{print $1}')"
+    saved_hash="$(cat "$sentinel")"
+    [[ "$current_hash" == "$saved_hash" ]] && return 0
+    return 1
+}
+
+# apply_patch <file> <patch_content>
+# Appends patch_content to file, writes new sentinel hash.
+# Backs up original to <file>.wired.orig if no backup exists.
+apply_patch() {
+    local file="$1" patch_content="$2"
+    [[ -f "${file}.wired.orig" ]] || sudo cp "$file" "${file}.wired.orig"
+    printf '%s\n' "$patch_content" | sudo tee -a "$file" > /dev/null
+    sha256sum "$file" | awk '{print $1}' | sudo tee "${file}.wired.bkp" > /dev/null
+    log_ok "patched $file"
+}
+
+# install_packages <array_name> <install_cmd...>
+# Nameref: install_packages pkgs_array "pacman" "-S" "--needed" "--noconfirm"
+# Each array entry: "pkg_name" or "pkg_name | dep | # comment" (only first field used).
+install_packages() {
+    local -n _pkgs="$1"
+    shift
+    local install_cmd=("$@")
+    local queue=()
+    for entry in "${_pkgs[@]}"; do
+        local pkg
+        pkg="$(printf '%s' "$entry" | cut -d'|' -f1 | tr -d ' ')"
+        [[ -n "$pkg" && "$pkg" != "#"* ]] && queue+=("$pkg")
+    done
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would install: ${queue[*]}"
+        return 0
+    fi
+    if [[ ${#queue[@]} -gt 0 ]]; then
+        "${install_cmd[@]}" "${queue[@]}"
+    fi
+}
