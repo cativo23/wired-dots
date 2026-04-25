@@ -11,8 +11,11 @@ export WIRED_COLOR_PURPLE='\033[38;2;187;154;247m'
 export WIRED_COLOR_MUTED='\033[38;2;86;95;137m'
 export WIRED_COLOR_RESET='\033[0m'
 
+: "${REPO_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+export REPO_ROOT
+
 export WIRED_DOTS_VERSION
-WIRED_DOTS_VERSION="$(cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../VERSION" 2>/dev/null || printf 'unknown\n')"
+WIRED_DOTS_VERSION="$(cat "$REPO_ROOT/VERSION" 2>/dev/null || printf 'unknown\n')"
 
 # Per-run log directory identifier
 : "${WIRED_LOG:=$(date +'%y%m%d_%Hh%Mm%Ss')}"
