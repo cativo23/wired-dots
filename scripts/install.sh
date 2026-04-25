@@ -190,6 +190,10 @@ run_phases() {
 
     if [[ "$NO_GPU" != "1" ]]; then
         run_phase "04a_gpu_detect.sh" "04a · GPU detect"
+        # Propagate override (in dry-run, run_phase doesn't execute the script, so do it here)
+        if [[ -n "${GPU_OVERRIDE:-}" && -z "${GPU_TYPE:-}" ]]; then
+            GPU_TYPE="$GPU_OVERRIDE"
+        fi
         case "${GPU_TYPE:-unknown}" in
             nvidia*) run_phase "04b_gpu_nvidia.sh" "04b · GPU NVIDIA" ;;
             amd*)    run_phase "04c_gpu_amd.sh"    "04c · GPU AMD" ;;
