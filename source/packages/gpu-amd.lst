@@ -1,5 +1,5 @@
 # AMD GPU packages
 mesa
 vulkan-radeon
-libva-mesa-driver
-mesa-vdpau
+# libva-mesa-driver — merged into mesa (no longer a separate package)
+# mesa-vdpau — merged into mesa (no longer a separate package)

@@ -18,8 +18,8 @@ waybar
 libnotify
 
 # Launcher + tools
-rofi-wayland
-wlogout
+rofi          # Wayland-capable since 2.0; replaces rofi-wayland
+# wlogout — moved to aur.lst (not in official repos)
 hyprpicker
 nwg-displays
 nwg-look
@@ -38,7 +38,7 @@ pipewire-pulse
 wireplumber
 gst-plugin-pipewire
 pavucontrol
-pwvucontrol
+# pwvucontrol — moved to aur.lst (not in official repos)
 pamixer
 playerctl
 
@@ -91,7 +91,7 @@ grim
 slurp
 
 # Wallpaper daemon
-swww
+awww          # successor to swww, now in extra repo
 
 # Power
 power-profiles-daemon
@@ -109,7 +109,7 @@ gnome-keyring
 libsecret
 
 # GTK theme tools
-gtk-engine-murrine
+# gtk-engine-murrine — moved to aur.lst (not in official repos)
 gnome-themes-extra
 
 # Terminal

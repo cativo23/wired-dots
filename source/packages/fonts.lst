@@ -8,5 +8,4 @@ ttf-nerd-fonts-symbols
 noto-fonts
 noto-fonts-emoji
 
-# Red Hat Display (for hyprlock)
-ttf-red-hat-fonts
+# Red Hat Display (for hyprlock) — moved to aur.lst as redhat-fonts
