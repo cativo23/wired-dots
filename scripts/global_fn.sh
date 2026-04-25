@@ -12,7 +12,7 @@ export WIRED_COLOR_MUTED='\033[38;2;86;95;137m'
 export WIRED_COLOR_RESET='\033[0m'
 
 export WIRED_DOTS_VERSION
-WIRED_DOTS_VERSION="$(cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../VERSION" 2>/dev/null || echo "unknown")"
+WIRED_DOTS_VERSION="$(cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../VERSION" 2>/dev/null || printf 'unknown\n')"
 
 # Per-run log directory identifier
 : "${WIRED_LOG:=$(date +'%y%m%d_%Hh%Mm%Ss')}"
@@ -26,6 +26,7 @@ print_log() {
     local line
     printf -v line '%b%s %s%b\n' "$color" "$symbol" "$msg" "$WIRED_COLOR_RESET"
     printf '%b' "$line"
+    # Write plain text (symbol + msg never contain ANSI codes)
     printf '%s\n' "$symbol $msg" >> "$log_file" 2>/dev/null || true
 }
 
