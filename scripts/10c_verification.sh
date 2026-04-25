@@ -15,7 +15,7 @@ VERIFY_PACKAGES=(
     pipewire
     wireplumber
     sddm
-    NetworkManager
+    networkmanager
     bash
 )
 
