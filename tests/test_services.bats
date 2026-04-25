@@ -51,12 +51,14 @@ setup() {
 }
 
 @test "10c check_package returns 0 for installed bash" {
+    command -v pacman >/dev/null 2>&1 || skip "pacman not available (non-Arch CI)"
     source "$REPO_ROOT/scripts/10c_verification.sh"
     run check_package "bash"
     [ "$status" -eq 0 ]
 }
 
 @test "10c check_package returns 1 for nonexistent-pkg-xyz" {
+    command -v pacman >/dev/null 2>&1 || skip "pacman not available (non-Arch CI)"
     source "$REPO_ROOT/scripts/10c_verification.sh"
     run check_package "nonexistent-pkg-xyz-wired"
     [ "$status" -eq 1 ]

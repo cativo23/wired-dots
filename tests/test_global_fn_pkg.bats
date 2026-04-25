@@ -6,11 +6,13 @@ setup() {
 }
 
 @test "pkg_installed returns 0 for bash (always installed on Arch)" {
+    command -v pacman >/dev/null 2>&1 || skip "pacman not available (non-Arch CI)"
     run pkg_installed "bash"
     [ "$status" -eq 0 ]
 }
 
 @test "pkg_installed returns 1 for a package that cannot exist" {
+    command -v pacman >/dev/null 2>&1 || skip "pacman not available (non-Arch CI)"
     run pkg_installed "wired-dots-definitely-not-a-real-package-xyz123"
     [ "$status" -eq 1 ]
 }
