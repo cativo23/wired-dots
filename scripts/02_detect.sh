@@ -54,10 +54,4 @@ main() {
     log_ok "hardware detection complete"
 }
 
-# Run detection when sourced so variables are available to callers.
-# Suppress stdout (printf outputs from detect_* helpers) so sourcing is clean.
-detect_phase >/dev/null 2>&1 || true
-
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main
-fi
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then main; fi
