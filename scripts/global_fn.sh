@@ -78,3 +78,34 @@ spinner() {
     done
     printf '\r%*s\r' "$(( ${#msg} + 3 ))" ''
 }
+
+# prompt_timer <seconds> <message> <default>
+# In NONINTERACTIVE=1 mode: immediately echoes default and returns.
+# Interactive: shows countdown, returns user input or default on timeout.
+prompt_timer() {
+    local timeout="$1" msg="$2" default="$3"
+    if [[ "${NONINTERACTIVE:-0}" == "1" ]]; then
+        printf '%s\n' "$default"
+        return 0
+    fi
+    local answer=""
+    printf '%b%s [%s] (auto in %ss): %b' \
+        "$WIRED_COLOR_YELLOW" "$msg" "$default" "$timeout" "$WIRED_COLOR_RESET"
+    if read -rt "$timeout" -n 1 answer; then
+        printf '\n'
+        answer="${answer:-$default}"
+    else
+        printf '\n'
+        answer="$default"
+    fi
+    printf '%s\n' "${answer,,}"
+}
+
+# confirm <prompt> <default_yn> <timeout>
+# Returns 0 for yes, 1 for no.
+confirm() {
+    local prompt="$1" default="${2:-y}" timeout="${3:-10}"
+    local answer
+    answer="$(prompt_timer "$timeout" "$prompt" "$default")"
+    [[ "${answer,,}" == "y"* ]]
+}
