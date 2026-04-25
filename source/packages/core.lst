@@ -16,6 +16,7 @@ libdrm
 # Bar + notifications
 waybar
 libnotify
+swaync
 
 # Launcher + tools
 rofi          # Wayland-capable since 2.0; replaces rofi-wayland
