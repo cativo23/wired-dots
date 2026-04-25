@@ -208,3 +208,69 @@ install_packages() {
         "${install_cmd[@]}" "${queue[@]}"
     fi
 }
+
+# detect_gpu — matches lspci output against source/detect/gpu-db.psv
+# Exports: GPU_TYPE (nvidia-turing-plus|amd-rdna|intel-xe-arc|...|unknown)
+#          GPU_PKG_LIST (filename from packages/)
+#          GPU_CMDLINE (kernel cmdline extras)
+#          GPU_ENV_VARS (space-separated VAR=value pairs)
+# Returns: 0 on success, 3 on unknown GPU
+detect_gpu() {
+    # Honor manual override (--gpu= flag or GPU_OVERRIDE env)
+    if [[ -n "${GPU_OVERRIDE:-}" ]]; then
+        export GPU_TYPE="$GPU_OVERRIDE"
+        log_info "GPU override: $GPU_TYPE"
+        printf '%s\n' "$GPU_TYPE"
+        return 0
+    fi
+
+    local db_file="$REPO_ROOT/source/detect/gpu-db.psv"
+    if [[ ! -f "$db_file" ]]; then
+        log_err "gpu-db.psv not found at $db_file"
+        return 3
+    fi
+
+    # Use LSPCI_OVERRIDE for testing, otherwise real lspci
+    local lspci_output
+    if [[ -n "${LSPCI_OVERRIDE:-}" ]]; then
+        lspci_output="[${LSPCI_OVERRIDE}]"
+    else
+        lspci_output="$(lspci -nn -d ::0300 2>/dev/null; lspci -nn -d ::0302 2>/dev/null)"
+    fi
+
+    local matches=()
+    local matched_pkg="" matched_cmdline="" matched_env=""
+    while IFS='|' read -r prefix gen pkg_list cmdline env_vars; do
+        [[ "$prefix" =~ ^#.*$ || -z "$prefix" ]] && continue
+        if printf '%s\n' "$lspci_output" | grep -qi "\[${prefix}"; then
+            matches+=("$gen")
+            matched_pkg="$pkg_list"
+            matched_cmdline="$cmdline"
+            matched_env="$env_vars"
+        fi
+    done < "$db_file"
+
+    if [[ ${#matches[@]} -eq 0 ]]; then
+        export GPU_TYPE="unknown"
+        log_warn "GPU not recognized — use --gpu=nvidia|amd|intel|hybrid to override"
+        printf 'unknown\n'
+        return 3
+    elif [[ ${#matches[@]} -gt 1 ]]; then
+        local first="${matches[0]}" second="${matches[1]}"
+        if [[ "$first" == amd-* || "$second" == amd-* ]]; then
+            export GPU_TYPE="hybrid-amd"
+        else
+            export GPU_TYPE="hybrid"
+        fi
+    else
+        export GPU_TYPE="${matches[0]}"
+    fi
+
+    export GPU_PKG_LIST="$matched_pkg"
+    export GPU_CMDLINE="$matched_cmdline"
+    export GPU_ENV_VARS="$matched_env"
+
+    log_info "GPU detected: $GPU_TYPE"
+    printf '%s\n' "$GPU_TYPE"
+    return 0
+}

@@ -10,6 +10,7 @@
 10de:21|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
 10de:24|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
 10de:26|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
+10de:22|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
 10de:27|nvidia-turing-plus|gpu-nvidia-modern.lst|nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1|LIBVA_DRIVER_NAME=nvidia __GLX_VENDOR_LIBRARY_NAME=nvidia NVD_BACKEND=direct GBM_BACKEND=nvidia-drm
 
 # NVIDIA Maxwell/Pascal (GTX 9xx/10xx)
