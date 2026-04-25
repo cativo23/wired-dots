@@ -120,6 +120,11 @@ TESTING
   --optimize-mirrors                Reflector-based mirror sort.
   --no-services                     Skip systemctl enable/restart.
 
+NOTES:
+  Legacy NVIDIA (Maxwell, Pascal, Fermi, Kepler) requires manual AUR install.
+  The installer will detect these GPUs and warn, but will not install drivers
+  automatically. See docs/NVIDIA-LEGACY.md for manual steps.
+
 See README.md for full documentation.
 EOF
 }
