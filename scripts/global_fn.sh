@@ -369,10 +369,20 @@ detect_aur_helper() {
         return 0
     fi
     log_warn "No AUR helper found — bootstrapping yay..."
+    # makepkg requires base-devel (fakeroot, debugedit, patch, ...). On a base
+    # Arch install these are missing, so ensure them before the build step.
+    if ! command -v fakeroot &>/dev/null || ! command -v debugedit &>/dev/null; then
+        log_info "installing base-devel (required for makepkg)..."
+        sudo pacman -S --noconfirm --needed --disable-download-timeout base-devel \
+            && log_ok "base-devel installed" \
+            || { log_err "base-devel install failed — cannot bootstrap yay"; return 1; }
+    fi
     local tmpdir
     tmpdir="$(mktemp -d)"
-    git clone --depth=1 https://aur.archlinux.org/yay.git "$tmpdir/yay"
-    ( cd "$tmpdir/yay" && makepkg -si --noconfirm )
+    git clone --depth=1 https://aur.archlinux.org/yay.git "$tmpdir/yay" \
+        || { log_err "git clone yay failed"; rm -rf "$tmpdir"; return 1; }
+    ( cd "$tmpdir/yay" && makepkg -si --noconfirm ) \
+        || { log_err "makepkg yay failed"; rm -rf "$tmpdir"; return 1; }
     rm -rf "$tmpdir"
     export AUR_HELPER="yay"
     printf 'yay\n'
