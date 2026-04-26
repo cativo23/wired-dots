@@ -128,6 +128,34 @@ activate_waybar_layout() {
     fi
 }
 
+deploy_waybar_styles() {
+    # cyberdeck-nerv.jsonc references @import "defaults.css" which lives in
+    # ~/.local/share/waybar/styles/. Without these files waybar renders unstyled.
+    local src="$REPO_ROOT/source/assets/waybar-styles"
+    local dst="$HOME/.local/share/waybar/styles"
+    if [[ ! -d "$src" ]]; then
+        log_skip "source/assets/waybar-styles/ not found"
+        return 0
+    fi
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would deploy waybar styles to $dst"
+        return 0
+    fi
+    mkdir -p "$dst"
+    cp "$src"/*.css "$dst/" 2>/dev/null && log_ok "waybar styles deployed → $dst"
+}
+
+rebuild_bat_cache() {
+    # bat alias uses --theme=tokyonight_night; the theme file is symlinked but
+    # bat needs `bat cache --build` to register it.
+    if ! command -v bat &>/dev/null; then return 0; fi
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would run bat cache --build"
+        return 0
+    fi
+    bat cache --build >/dev/null 2>&1 && log_ok "bat theme cache rebuilt"
+}
+
 deploy_wallpapers() {
     local dst="$HOME/.config/wired-dots/wallpapers"
     local src="$REPO_ROOT/source/wallpapers"
@@ -156,10 +184,12 @@ main() {
     log_step "06" "symlinks"
     link_config_dirs
     activate_waybar_layout
+    deploy_waybar_styles
     link_home_dotfiles
     link_bin_files
     link_system_assets
     deploy_wallpapers
+    rebuild_bat_cache
     log_ok "symlinks complete"
 }
 
