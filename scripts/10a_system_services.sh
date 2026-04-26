@@ -11,6 +11,7 @@ source "$SCRIPTS_DIR/global_fn.sh"
 SYSTEM_SERVICES=(
     NetworkManager
     bluetooth
+    acpid          # ACPI events (lid, power button) — required for graceful suspend
 )
 
 enable_system_services() {
