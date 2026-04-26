@@ -66,11 +66,36 @@ enable_seatd() {
     fi
 }
 
+change_login_shell() {
+    # Switch the user's login shell to zsh. Required for ~/.config/zsh/.zshrc
+    # to be sourced (and therefore starship/aliases to load) at SDDM login.
+    local user="${SUDO_USER:-${USER:-$(id -un)}}"
+    local current_shell
+    current_shell="$(getent passwd "$user" | cut -d: -f7)"
+
+    if [[ "$current_shell" == "/usr/bin/zsh" || "$current_shell" == "/bin/zsh" ]]; then
+        log_skip "login shell for $user is already zsh"
+        return 0
+    fi
+    if ! command -v zsh &>/dev/null; then
+        log_warn "zsh not installed — skipping shell change"
+        return 0
+    fi
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would chsh -s /usr/bin/zsh $user"
+        return 0
+    fi
+    sudo chsh -s /usr/bin/zsh "$user" \
+        && log_ok "login shell for $user changed to /usr/bin/zsh" \
+        || log_warn "chsh failed for $user"
+}
+
 main() {
     log_step "10a" "system services"
     enable_system_services
     enable_display_manager
     enable_seatd
+    change_login_shell
     log_ok "system services complete"
 }
 

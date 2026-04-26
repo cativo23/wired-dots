@@ -104,12 +104,62 @@ link_system_assets() {
     sudo udevadm control --reload-rules 2>/dev/null && log_ok "udev rules reloaded" || log_warn "udev reload failed"
 }
 
+activate_waybar_layout() {
+    # waybar wants config.jsonc + style.css at $XDG_CONFIG_HOME/waybar/.
+    # We ship layouts/cyberdeck-nerv.jsonc (the bar definition) and theme.css +
+    # user-style.css (palette + custom overrides). Materialize the active pair.
+    local waybar_dir="$REPO_ROOT/waybar"
+    if [[ ! -d "$waybar_dir" ]]; then
+        log_skip "waybar/ not found, skipping layout activation"
+        return 0
+    fi
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would copy waybar/layouts/cyberdeck-nerv.jsonc → waybar/config.jsonc"
+        log_info "[dry-run] would concat waybar/theme.css + user-style.css → waybar/style.css"
+        return 0
+    fi
+    if [[ -f "$waybar_dir/layouts/cyberdeck-nerv.jsonc" ]]; then
+        cp "$waybar_dir/layouts/cyberdeck-nerv.jsonc" "$waybar_dir/config.jsonc"
+        log_ok "waybar config.jsonc activated (cyberdeck-nerv layout)"
+    fi
+    if [[ -f "$waybar_dir/theme.css" || -f "$waybar_dir/user-style.css" ]]; then
+        cat "$waybar_dir/theme.css" "$waybar_dir/user-style.css" 2>/dev/null > "$waybar_dir/style.css"
+        log_ok "waybar style.css generated (theme + user overrides)"
+    fi
+}
+
+deploy_wallpapers() {
+    local dst="$HOME/.config/wired-dots/wallpapers"
+    local src="$REPO_ROOT/source/wallpapers"
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would deploy wallpapers to $dst"
+        return 0
+    fi
+    mkdir -p "$dst"
+    # Copy any wallpapers shipped with the repo
+    if compgen -G "$src"/*.{jpg,jpeg,png,webp} >/dev/null 2>&1; then
+        cp -n "$src"/*.{jpg,jpeg,png,webp} "$dst/" 2>/dev/null
+        log_ok "deployed shipped wallpapers → $dst"
+        return 0
+    fi
+    # Fall back to generating a Tokyo Night gradient if magick is available
+    # (imagemagick is in core.lst so this should work post-install)
+    if command -v magick &>/dev/null && [[ -z "$(ls -A "$dst" 2>/dev/null)" ]]; then
+        magick -size 1920x1080 gradient:"#1a1b26"-"#16161e" "$dst/tokyo.png" 2>/dev/null \
+            && log_ok "generated default Tokyo Night wallpaper → $dst/tokyo.png"
+    else
+        log_skip "no wallpapers shipped + magick unavailable — wallpaper dir left empty"
+    fi
+}
+
 main() {
     log_step "06" "symlinks"
     link_config_dirs
+    activate_waybar_layout
     link_home_dotfiles
     link_bin_files
     link_system_assets
+    deploy_wallpapers
     log_ok "symlinks complete"
 }
 
