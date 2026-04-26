@@ -141,9 +141,14 @@ require_sudo() {
         return 0
     fi
     if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then return 0; fi
-    if ! sudo -v; then
-        log_err "sudo authentication failed"
-        exit 2
+    # If NOPASSWD or a fresh cache is in place, sudo -n true succeeds and we
+    # skip the interactive validation. Otherwise fall back to sudo -v which
+    # prompts for the password once (requires a tty).
+    if ! sudo -n true 2>/dev/null; then
+        if ! sudo -v; then
+            log_err "sudo authentication failed"
+            exit 2
+        fi
     fi
     start_sudo_keepalive
 }
