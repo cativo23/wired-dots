@@ -184,13 +184,21 @@ sentinel_check() {
     return 1
 }
 
-# apply_patch <file> <patch_content>
-# Appends patch_content to file, writes new sentinel hash.
+# apply_patch <file> <patch_content> [anchor_regex]
+# Inserts patch_content into file (after anchor_regex if given, else appends to end).
 # Backs up original to <file>.wired.orig if no backup exists.
+# Writes a new sentinel hash to <file>.wired.bkp.
 apply_patch() {
-    local file="$1" patch_content="$2"
+    local file="$1" patch_content="$2" anchor="${3:-}"
     [[ -f "${file}.wired.orig" ]] || sudo cp "$file" "${file}.wired.orig"
-    printf '%s\n' "$patch_content" | sudo tee -a "$file" > /dev/null
+    if [[ -n "$anchor" ]]; then
+        local tmp; tmp="$(mktemp)"
+        printf '%s\n' "$patch_content" > "$tmp"
+        sudo sed -i "/$anchor/r $tmp" "$file"
+        rm -f "$tmp"
+    else
+        printf '%s\n' "$patch_content" | sudo tee -a "$file" > /dev/null
+    fi
     sha256sum "$file" | awk '{print $1}' | sudo tee "${file}.wired.bkp" > /dev/null
     log_ok "patched $file"
 }
@@ -208,6 +216,12 @@ install_packages() {
         pkg="$(printf '%s' "$entry" | cut -d'|' -f1 | tr -d ' ')"
         [[ -n "$pkg" && "$pkg" != "#"* ]] && queue+=("$pkg")
     done
+    # Avoid transaction abort on transient slow mirrors (pacman default times
+    # out a download at <1 B/s for 10s). yay/paru pass the flag through to pacman.
+    case " ${install_cmd[*]} " in
+        *' pacman '*|*' yay '*|*' paru '*)
+            install_cmd+=( "--disable-download-timeout" ) ;;
+    esac
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
         log_info "[dry-run] would install: ${queue[*]}"
         return 0

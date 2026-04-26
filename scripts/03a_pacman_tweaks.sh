@@ -20,11 +20,12 @@ patch_pacman_conf() {
     local state=0
     # Capture exit code safely under set -e: sentinel_check returns 1 or 2 on non-applied states
     sentinel_check "$PACMAN_CONF" && state=0 || state=$?
+    # Insert under [options] (not at end-of-file, which would land in the last [repo] section)
     case $state in
         0) log_skip "pacman.conf already patched (sentinel ok)" ;;
         1) log_warn "pacman.conf changed since last apply — re-patching"
-           apply_patch "$PACMAN_CONF" "$PACMAN_PATCH" ;;
-        2) apply_patch "$PACMAN_CONF" "$PACMAN_PATCH" ;;
+           apply_patch "$PACMAN_CONF" "$PACMAN_PATCH" '^\[options\]' ;;
+        2) apply_patch "$PACMAN_CONF" "$PACMAN_PATCH" '^\[options\]' ;;
     esac
 }
 
