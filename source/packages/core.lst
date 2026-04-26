@@ -80,6 +80,7 @@ kvantum-qt5
 
 # File manager
 nautilus
+dolphin       # KDE file manager (Plasma deps come along, used for image-heavy workflows)
 udiskie
 
 # Clipboard
