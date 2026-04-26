@@ -13,6 +13,9 @@ alias cdw='cd ~/projects/work'
 alias lsp='ls -1 ~/projects/personal'
 alias lsw='ls -1 ~/projects/work'
 
+# Default editor (override in user.local.zsh if you don't use VS Code)
+export EDITOR="${EDITOR:-code}"
+
 # Tool aliases
 alias cat='bat --theme=tokyonight_night'
 alias sysup='paru -Syu --noconfirm 2>/dev/null || yay -Syu --noconfirm; flatpak update'
