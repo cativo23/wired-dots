@@ -3,9 +3,8 @@
 # Screenshot
 hyprshot
 
-# Logout / launcher / audio (not in official repos)
+# Logout / launcher (not in official repos)
 wlogout
-pwvucontrol
 
 # GTK theme engine (not in official repos)
 gtk-engine-murrine

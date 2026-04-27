@@ -39,7 +39,6 @@ pipewire-pulse
 wireplumber
 gst-plugin-pipewire
 pavucontrol
-# pwvucontrol — moved to aur.lst (not in official repos)
 pamixer
 playerctl
 
