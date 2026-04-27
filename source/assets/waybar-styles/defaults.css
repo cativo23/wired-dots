@@ -1,5 +1,0 @@
-/* wired-dots — minimal defaults.css
- * cyberdeck-nerv.css imports this for compatibility but redefines all its own
- * styles. This file exists to satisfy the @import without dragging in upstream
- * group/class CSS dependencies.
- */
