@@ -105,44 +105,25 @@ link_system_assets() {
 }
 
 activate_waybar_layout() {
-    # waybar wants config.jsonc + style.css at $XDG_CONFIG_HOME/waybar/.
-    # We ship layouts/cyberdeck-nerv.jsonc (the bar definition) and theme.css +
-    # user-style.css (palette + custom overrides). Materialize the active pair.
+    # Per design spec: waybar/config.jsonc points at layouts/cyberdeck-nerv.jsonc
+    # and waybar/style.css points at styles/cyberdeck-nerv.css. styles/defaults.css
+    # is also materialized next to style.css so the @import resolves locally.
     local waybar_dir="$REPO_ROOT/waybar"
-    if [[ ! -d "$waybar_dir" ]]; then
-        log_skip "waybar/ not found, skipping layout activation"
+    local layout="$waybar_dir/layouts/cyberdeck-nerv.jsonc"
+    local style="$waybar_dir/styles/cyberdeck-nerv.css"
+    local defaults="$waybar_dir/styles/defaults.css"
+    if [[ ! -f "$layout" ]] || [[ ! -f "$style" ]] || [[ ! -f "$defaults" ]]; then
+        log_skip "waybar layout/style sources missing, skipping activation"
         return 0
     fi
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would copy waybar/layouts/cyberdeck-nerv.jsonc → waybar/config.jsonc"
-        log_info "[dry-run] would concat waybar/theme.css + user-style.css → waybar/style.css"
+        log_info "[dry-run] would activate waybar layout cyberdeck-nerv"
         return 0
     fi
-    if [[ -f "$waybar_dir/layouts/cyberdeck-nerv.jsonc" ]]; then
-        cp "$waybar_dir/layouts/cyberdeck-nerv.jsonc" "$waybar_dir/config.jsonc"
-        log_ok "waybar config.jsonc activated (cyberdeck-nerv layout)"
-    fi
-    if [[ -f "$waybar_dir/theme.css" || -f "$waybar_dir/user-style.css" ]]; then
-        cat "$waybar_dir/theme.css" "$waybar_dir/user-style.css" 2>/dev/null > "$waybar_dir/style.css"
-        log_ok "waybar style.css generated (theme + user overrides)"
-    fi
-}
-
-deploy_waybar_styles() {
-    # cyberdeck-nerv.jsonc references @import "defaults.css" which lives in
-    # ~/.local/share/waybar/styles/. Without these files waybar renders unstyled.
-    local src="$REPO_ROOT/source/assets/waybar-styles"
-    local dst="$HOME/.local/share/waybar/styles"
-    if [[ ! -d "$src" ]]; then
-        log_skip "source/assets/waybar-styles/ not found"
-        return 0
-    fi
-    if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would deploy waybar styles to $dst"
-        return 0
-    fi
-    mkdir -p "$dst"
-    cp "$src"/*.css "$dst/" 2>/dev/null && log_ok "waybar styles deployed → $dst"
+    cp "$layout"   "$waybar_dir/config.jsonc"
+    cp "$style"    "$waybar_dir/style.css"
+    cp "$defaults" "$waybar_dir/defaults.css"
+    log_ok "waybar layout activated (cyberdeck-nerv)"
 }
 
 rebuild_bat_cache() {
@@ -157,6 +138,9 @@ rebuild_bat_cache() {
 }
 
 deploy_wallpapers() {
+    # Copy shipped wallpapers to ~/.config/wired-dots/wallpapers/. The default
+    # is applied at session start by Hyprland exec-once (`wallpaper set …`),
+    # not here — awww-daemon needs $WAYLAND_DISPLAY which doesn't exist yet.
     local dst="$HOME/.config/wired-dots/wallpapers"
     local src="$REPO_ROOT/source/wallpapers"
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
@@ -164,17 +148,23 @@ deploy_wallpapers() {
         return 0
     fi
     mkdir -p "$dst"
-    # Copy any wallpapers shipped with the repo
-    if compgen -G "$src"/*.{jpg,jpeg,png,webp} >/dev/null 2>&1; then
-        cp -n "$src"/*.{jpg,jpeg,png,webp} "$dst/" 2>/dev/null
-        log_ok "deployed shipped wallpapers → $dst"
-        return 0
-    fi
-    # Fall back to generating a Tokyo Night gradient if magick is available
-    # (imagemagick is in core.lst so this should work post-install)
-    if command -v magick &>/dev/null && [[ -z "$(ls -A "$dst" 2>/dev/null)" ]]; then
-        magick -size 1920x1080 gradient:"#1a1b26"-"#16161e" "$dst/tokyo.png" 2>/dev/null \
-            && log_ok "generated default Tokyo Night wallpaper → $dst/tokyo.png"
+
+    # Collect shipped wallpapers via subshell with nullglob so unmatched globs
+    # disappear (the previous compgen brace-expand only ever checked *.jpg).
+    local -a files
+    mapfile -t files < <(
+        shopt -s nullglob
+        printf '%s\n' "$src"/*.jpg "$src"/*.jpeg "$src"/*.png "$src"/*.webp
+    )
+
+    if (( ${#files[@]} > 0 )); then
+        cp -n "${files[@]}" "$dst/"
+        log_ok "deployed ${#files[@]} wallpaper(s) → $dst"
+    elif command -v magick &>/dev/null && [[ -z "$(ls -A "$dst" 2>/dev/null)" ]]; then
+        # imagemagick is in core.lst so this should work post-install
+        magick -size 1920x1080 gradient:"#1a1b26"-"#16161e" \
+            "$dst/tokyo-night-default.png" 2>/dev/null \
+            && log_ok "generated default Tokyo Night wallpaper → $dst/tokyo-night-default.png"
     else
         log_skip "no wallpapers shipped + magick unavailable — wallpaper dir left empty"
     fi
@@ -184,7 +174,6 @@ main() {
     log_step "06" "symlinks"
     link_config_dirs
     activate_waybar_layout
-    deploy_waybar_styles
     link_home_dotfiles
     link_bin_files
     link_system_assets
