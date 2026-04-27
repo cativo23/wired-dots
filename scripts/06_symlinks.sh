@@ -162,7 +162,7 @@ deploy_wallpapers() {
         log_ok "deployed ${#files[@]} wallpaper(s) → $dst"
     elif command -v magick &>/dev/null && [[ -z "$(ls -A "$dst" 2>/dev/null)" ]]; then
         # imagemagick is in core.lst so this should work post-install
-        magick -size 1920x1080 gradient:"#1a1b26"-"#16161e" \
+        magick -size 1920x1080 'gradient:#1a1b26-#16161e' \
             "$dst/tokyo-night-default.png" 2>/dev/null \
             && log_ok "generated default Tokyo Night wallpaper → $dst/tokyo-night-default.png"
     else
