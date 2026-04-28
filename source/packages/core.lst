@@ -78,8 +78,9 @@ kvantum
 kvantum-qt5
 
 # File manager
-nautilus
-dolphin       # KDE file manager (Plasma deps come along, used for image-heavy workflows)
+# File manager — picked at install time via --with-file-manager
+# (default: dolphin). Installed by 03b_core_packages.sh + 03f_aur_packages.sh
+# from $WIRED_FILE_MANAGER. See scripts/install.sh USER CHOICES.
 udiskie
 
 # Clipboard

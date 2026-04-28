@@ -9,8 +9,8 @@ wlogout
 # GTK theme engine (not in official repos)
 gtk-engine-murrine
 
-# Browser
-brave-bin
+# Browser — picked at install time via --with-browser (default: brave-bin).
+# Installed dynamically by 03f_aur_packages.sh from $WIRED_BROWSER.
 
 # Themes
 tokyonight-gtk-theme-git

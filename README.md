@@ -42,6 +42,22 @@ cd ~/wired-dots
 > magick-generated dark gradient as the only wallpaper. Already cloned without
 > it? Run `git submodule update --init --recursive` from the repo root.
 
+The installer prompts for keyboard layout, browser, and file manager on first
+run. To skip the prompts pass them as flags (or `--noninteractive` for
+defaults `us` / `brave-bin` / `dolphin`):
+
+```bash
+./install.sh --kb-layout=us --with-browser=firefox --with-file-manager=thunar
+```
+
+Allowed values:
+
+| Flag | Options |
+|------|---------|
+| `--kb-layout` | `us`, `latam,us`, `es`, `fr`, `de`, `br`, `gb` |
+| `--with-browser` | `brave-bin`, `firefox`, `chromium` |
+| `--with-file-manager` | `dolphin`, `nautilus`, `thunar`, `nemo`, `pcmanfm-gtk3` |
+
 ## What you get
 
 - Hyprland compositor with Tokyo Night palette

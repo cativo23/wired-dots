@@ -19,12 +19,29 @@ read_pkg_list() {
     done < "$file"
 }
 
+# Append a user-chosen package to the install list when it lives in the
+# official pacman repos. AUR-only choices go to 03f.
+append_user_choice_if_repo() {
+    local -n out_arr="$1"
+    local pkg="$2"
+    [[ -z "$pkg" ]] && return 0
+    if pacman -Si "$pkg" >/dev/null 2>&1; then
+        out_arr+=("$pkg")
+    fi
+}
+
 main() {
     log_step "03b" "core packages"
     local pkgs_raw=()
     while IFS= read -r pkg; do
         pkgs_raw+=("$pkg")
     done < <(read_pkg_list "$REPO_ROOT/source/packages/core.lst")
+
+    # User choice: file manager + browser, when they're in the pacman repos
+    # (everything except brave-bin). Skips silently in DRY_RUN since pacman -Si
+    # may still work, or in --no-packages where this whole phase is skipped.
+    append_user_choice_if_repo pkgs_raw "${WIRED_FILE_MANAGER:-}"
+    append_user_choice_if_repo pkgs_raw "${WIRED_BROWSER:-}"
 
     install_packages pkgs_raw "sudo" "pacman" "-S" "--needed" "--noconfirm"
     log_ok "core packages complete"

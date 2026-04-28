@@ -24,6 +24,17 @@ main() {
         pkgs_raw+=("${line%% *}")
     done < "$REPO_ROOT/source/packages/aur.lst"
 
+    # User-choice browser when it's NOT in the pacman repos (e.g. brave-bin).
+    # Repo-resident choices (firefox, chromium) were already installed by 03b.
+    if [[ -n "${WIRED_BROWSER:-}" ]] && ! pacman -Si "$WIRED_BROWSER" >/dev/null 2>&1; then
+        pkgs_raw+=("$WIRED_BROWSER")
+    fi
+    # Same for file manager — most are repo, but if a future option is AUR-only
+    # this catches it without code change.
+    if [[ -n "${WIRED_FILE_MANAGER:-}" ]] && ! pacman -Si "$WIRED_FILE_MANAGER" >/dev/null 2>&1; then
+        pkgs_raw+=("$WIRED_FILE_MANAGER")
+    fi
+
     install_packages pkgs_raw "${AUR_HELPER:-yay}" "-S" "--needed" "--noconfirm"
     log_ok "AUR packages complete"
 }
