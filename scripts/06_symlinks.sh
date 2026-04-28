@@ -10,7 +10,6 @@ source "$SCRIPTS_DIR/global_fn.sh"
 
 CONFIG_DIRS=(
     hypr
-    waybar
     kitty
     starship
     fastfetch
@@ -27,8 +26,9 @@ CONFIG_DIRS=(
     wireplumber
     git
 )
-# zsh/ is intentionally NOT here — it uses a hybrid layout (wired-managed
-# files symlinked, user-owned files one-time-copied) handled by deploy_zsh().
+# zsh/ and waybar/ are intentionally NOT here — they use file-level layouts
+# (per-file symlinks, deploy-time files) handled by deploy_zsh() and
+# deploy_waybar() respectively.
 
 link_config_dirs() {
     mkdir -p "$HOME/.config"
@@ -157,26 +157,71 @@ link_system_assets() {
     sudo udevadm control --reload-rules 2>/dev/null && log_ok "udev rules reloaded" || log_warn "udev reload failed"
 }
 
-activate_waybar_layout() {
-    # Per design spec: waybar/config.jsonc points at layouts/cyberdeck-nerv.jsonc
-    # and waybar/style.css points at styles/cyberdeck-nerv.css. styles/defaults.css
-    # is also materialized next to style.css so the @import resolves locally.
-    local waybar_dir="$REPO_ROOT/waybar"
-    local layout="$waybar_dir/layouts/cyberdeck-nerv.jsonc"
-    local style="$waybar_dir/styles/cyberdeck-nerv.css"
-    local defaults="$waybar_dir/styles/defaults.css"
-    if [[ ! -f "$layout" ]] || [[ ! -f "$style" ]] || [[ ! -f "$defaults" ]]; then
-        log_skip "waybar layout/style sources missing, skipping activation"
+deploy_waybar() {
+    # File-level layout for ~/.config/waybar/. Replaces the old whole-dir
+    # symlink + cp-into-source-dir pattern, which dirtied the repo on every
+    # install (gitignored, but still ugly) and meant `~/.config/waybar/X`
+    # writes always backflowed into the repo.
+    #
+    #   ~/.config/waybar/                  real directory
+    #     ├── modules/   → repo/waybar/modules/   (subdir symlink)
+    #     ├── includes/  → repo/waybar/includes/
+    #     ├── layouts/   → repo/waybar/layouts/
+    #     ├── styles/    → repo/waybar/styles/
+    #     ├── menus/     → repo/waybar/menus/      (if present)
+    #     ├── config.jsonc   → repo/waybar/layouts/cyberdeck-nerv.jsonc
+    #     ├── style.css      → repo/waybar/styles/cyberdeck-nerv.css
+    #     └── defaults.css   → repo/waybar/styles/defaults.css
+    local src="$REPO_ROOT/waybar"
+    local dst="$HOME/.config/waybar"
+    if [[ ! -d "$src" ]]; then
+        log_skip "waybar/ source dir not found"
         return 0
     fi
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would activate waybar layout cyberdeck-nerv"
+        log_info "[dry-run] would deploy waybar/ via per-file symlinks to $dst"
         return 0
     fi
-    cp "$layout"   "$waybar_dir/config.jsonc"
-    cp "$style"    "$waybar_dir/style.css"
-    cp "$defaults" "$waybar_dir/defaults.css"
-    log_ok "waybar layout activated (cyberdeck-nerv)"
+
+    # Migration: pre-PR-G installs whole-dir-symlinked ~/.config/waybar to
+    # repo/waybar/, AND wrote generated config.jsonc/style.css/defaults.css
+    # into the source dir. Drop the symlink and the orphan generated files
+    # so the new layout owns the deploy target cleanly.
+    if [[ -L "$dst" ]]; then
+        log_warn "migrating waybar/ from whole-dir symlink to file-level layout"
+        rm -f "$dst"
+    fi
+    local orphan
+    for orphan in "$src/config.jsonc" "$src/style.css" "$src/defaults.css"; do
+        [[ -f "$orphan" && ! -L "$orphan" ]] && rm -f "$orphan"
+    done
+
+    mkdir -p "$dst"
+
+    # Subdirs that ship in the repo: link as a unit so module/style edits in
+    # the repo land in ~/.config/waybar/ without re-running the installer.
+    local sub
+    for sub in modules includes layouts styles menus; do
+        if [[ -d "$src/$sub" ]]; then
+            symlink_safe "$src/$sub" "$dst/$sub"
+        fi
+    done
+
+    # Active layout + style + defaults: file-level symlinks pointing at the
+    # canonical sources under styles/ and layouts/. Switching the active
+    # layout becomes `ln -sfn layouts/<other>.jsonc config.jsonc`.
+    if [[ -f "$src/layouts/cyberdeck-nerv.jsonc" ]]; then
+        symlink_safe "$src/layouts/cyberdeck-nerv.jsonc" "$dst/config.jsonc"
+    fi
+    if [[ -f "$src/styles/cyberdeck-nerv.css" ]]; then
+        symlink_safe "$src/styles/cyberdeck-nerv.css" "$dst/style.css"
+    fi
+    if [[ -f "$src/styles/defaults.css" ]]; then
+        # Also at the deploy root so style.css's `@import "defaults.css"` works
+        # whether GTK CSS resolves relative to the symlink or its target.
+        symlink_safe "$src/styles/defaults.css" "$dst/defaults.css"
+    fi
+    log_ok "waybar deployed (cyberdeck-nerv layout active)"
 }
 
 rebuild_bat_cache() {
@@ -254,7 +299,7 @@ main() {
     log_step "06" "symlinks"
     link_config_dirs
     deploy_zsh
-    activate_waybar_layout
+    deploy_waybar
     link_home_dotfiles
     link_bin_files
     link_system_assets

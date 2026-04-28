@@ -16,14 +16,19 @@ export REPO_ROOT SCRIPTS_DIR
 # shellcheck source=scripts/global_fn.sh
 source "$SCRIPTS_DIR/global_fn.sh"
 
-# Mirrors 06_symlinks.sh CONFIG_DIRS. zsh/ is handled separately because it
-# uses a hybrid layout (symlinks + one-time copies).
+# Mirrors 06_symlinks.sh CONFIG_DIRS. zsh/ and waybar/ are handled
+# separately because they use file-level layouts (symlinks + deploy-time
+# files) rather than whole-dir symlinks.
 CONFIG_DIRS=(
-    hypr waybar kitty starship fastfetch swaync rofi wlogout
+    hypr kitty starship fastfetch swaync rofi wlogout
     bat gtk-3.0 gtk-4.0 qt5ct qt6ct Kvantum xdg-desktop-portal
     wireplumber git
 )
 ZSH_MANAGED_FILES=( .zshrc wired-defaults.zsh )
+WAYBAR_MANAGED_ITEMS=(
+    modules includes layouts styles menus
+    config.jsonc style.css defaults.css
+)
 HOME_DOTFILES=( .zshenv .gtkrc-2.0 )
 BIN_FILES=( cliphist-rofi power-profile-switch screenshot.sh wallpaper )
 
@@ -52,6 +57,33 @@ remove_symlinks_from() {
         fi
     done
     log_info "$label: removed $removed symlink(s)"
+}
+
+remove_waybar_symlinks() {
+    # File-level layout post-PR-G: ~/.config/waybar is a real dir with
+    # per-subdir + per-file symlinks. Unlink the wired-managed items;
+    # remove the dir if it's empty afterwards (preserves any stray user
+    # files like a hand-written user-style.css).
+    local waybar_dir="$HOME/.config/waybar"
+    [[ -d "$waybar_dir" ]] || return 0
+    local removed=0
+    local item target
+    for item in "${WAYBAR_MANAGED_ITEMS[@]}"; do
+        target="$waybar_dir/$item"
+        if [[ -L "$target" ]]; then
+            if [[ "${DRY_RUN:-0}" == "1" ]]; then
+                log_info "[dry-run] would unlink: $target"
+            else
+                rm -f "$target"
+                log_ok "removed symlink: $target"
+            fi
+            (( removed++ )) || true
+        fi
+    done
+    if [[ "${DRY_RUN:-0}" != "1" ]] && [[ -z "$(ls -A "$waybar_dir" 2>/dev/null)" ]]; then
+        rmdir "$waybar_dir" 2>/dev/null && log_ok "removed empty $waybar_dir"
+    fi
+    log_info "waybar: removed $removed symlink(s)"
 }
 
 remove_zsh_symlinks() {
@@ -174,6 +206,7 @@ main() {
     log_step "uninstall" "wired-dots M0 minimum viable"
     remove_symlinks_from "configs"       "$HOME/.config"    "${CONFIG_DIRS[@]}"
     remove_zsh_symlinks
+    remove_waybar_symlinks
     remove_symlinks_from "home dotfiles" "$HOME"            "${HOME_DOTFILES[@]}"
     remove_symlinks_from "bin"           "$HOME/.local/bin" "${BIN_FILES[@]}"
     remove_runtime_artifacts
