@@ -1,6 +1,6 @@
 # Legacy NVIDIA GPU Setup
 
-wired-dots v1.0.0-rc2 does not automatically install drivers for legacy NVIDIA
+wired-dots v1.0.0-rc3 does not automatically install drivers for legacy NVIDIA
 GPU generations (Maxwell, Pascal, Fermi, Kepler). These require AUR packages
 that take significant time to build.
 
