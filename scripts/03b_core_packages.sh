@@ -43,6 +43,19 @@ main() {
     append_user_choice_if_repo pkgs_raw "${WIRED_FILE_MANAGER:-}"
     append_user_choice_if_repo pkgs_raw "${WIRED_BROWSER:-}"
 
+    # Power-management swap: with --with-tlp, replace power-profiles-daemon
+    # with tlp + tlp-rdw. PPD and TLP both compete for cpufreq governor
+    # control, so they must not be installed together.
+    if [[ "${WITH_TLP:-0}" == "1" ]]; then
+        local filtered=()
+        local p
+        for p in "${pkgs_raw[@]}"; do
+            [[ "$p" == "power-profiles-daemon" ]] && continue
+            filtered+=("$p")
+        done
+        pkgs_raw=( "${filtered[@]}" tlp tlp-rdw )
+    fi
+
     install_packages pkgs_raw "sudo" "pacman" "-S" "--needed" "--noconfirm"
     log_ok "core packages complete"
 }
