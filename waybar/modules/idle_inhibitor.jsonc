@@ -1,0 +1,12 @@
+{
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "󰅶",
+      "deactivated": "󰾪"
+    },
+    "tooltip": true,
+    "tooltip-format-activated": "Caffeine ON — system stays awake",
+    "tooltip-format-deactivated": "Caffeine OFF — normal idle behavior"
+  }
+}
