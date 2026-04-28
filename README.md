@@ -19,7 +19,7 @@
 [![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-5046e4?style=flat)](https://hyprland.org/)
 [![ShellCheck](https://img.shields.io/badge/shellcheck-passing-brightgreen?style=flat)](https://github.com/cativo23/wired-dots/actions)
 
-> **Status:** v0.3.0-dev — installer complete, approaching v1.0.0-rc1
+> **Status:** v1.0.0-rc2 — installer complete and live-validated end-to-end
 
 </div>
 
@@ -103,7 +103,9 @@ See [docs/troubleshooting.md](docs/troubleshooting.md).
 | M2 | Installer skeleton (preflight, detect, `--dry-run`) | ✅ complete |
 | M3 | Core phases (packages, audio, fonts, symlinks, theme, services) | ✅ complete |
 | M4 | Config corpus | 🔲 in progress |
-| RC | v1.0.0-rc1 release candidate | 🔲 pending |
+| RC | v1.0.0-rc1 release candidate | ✅ complete |
+| RC | v1.0.0-rc2 — wallpaper + waybar + PATH + uninstaller fixes | ✅ complete |
+| 1.0 | Stable release | 🔲 pending |
 
 ## Contributing
 
