@@ -420,15 +420,3 @@ tooltip {
     font-size: 11px;
 }
 
-/* ═══════════════════════════════════════════
-   CLAUDE CODE (kept from v1)
-   ═══════════════════════════════════════════ */
-
-#custom-claude-code {
-    color: #c0caf5;
-    padding: 0 6px;
-}
-
-#custom-claude-code:hover {
-    color: #ff9e64;
-}
