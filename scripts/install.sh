@@ -29,7 +29,31 @@ export OPTIMIZE_MIRRORS=0
 export ON_CONFLICT="overwrite"
 export PREFIX=""
 
+# ── User choices (flags + interactive prompts) ───────────────────────────────
+# Empty defaults so we can detect "not set" vs "explicitly chosen via flag".
+# interactive_prompts() fills missing values; final fallbacks land in
+# 02b_user_choices.sh.
+export KB_LAYOUT=""
+export WIRED_BROWSER=""
+export WIRED_FILE_MANAGER=""
+
+# Choice catalogs — used both for validation and for the interactive menu.
+KB_LAYOUT_OPTIONS=( "us" "latam,us" "es" "fr" "de" "br" "gb" )
+BROWSER_OPTIONS=(   "brave-bin" "firefox" "chromium" )
+FM_OPTIONS=(        "dolphin" "nautilus" "thunar" "nemo" "pcmanfm-gtk3" )
+
 # ── Flag parsing ──────────────────────────────────────────────────────────────
+_validate_choice() {
+    # _validate_choice <flag-name> <value> <option1> <option2> ...
+    local flag="$1" value="$2"; shift 2
+    local opt
+    for opt in "$@"; do
+        [[ "$opt" == "$value" ]] && return 0
+    done
+    log_err "Unknown $flag value: $value. Allowed: $*"
+    exit 1
+}
+
 parse_flags() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -68,6 +92,19 @@ parse_flags() {
             --on-conflict=*)
                 log_err "Unknown conflict strategy: ${1#--on-conflict=}. Use overwrite|skip|abort"
                 exit 1 ;;
+            --kb-layout=*)
+                KB_LAYOUT="${1#--kb-layout=}"
+                _validate_choice "--kb-layout" "$KB_LAYOUT" "${KB_LAYOUT_OPTIONS[@]}"
+                ;;
+            --with-browser=*)
+                WIRED_BROWSER="${1#--with-browser=}"
+                _validate_choice "--with-browser" "$WIRED_BROWSER" "${BROWSER_OPTIONS[@]}"
+                ;;
+            --with-file-manager=*)
+                WIRED_FILE_MANAGER="${1#--with-file-manager=}"
+                _validate_choice "--with-file-manager" "$WIRED_FILE_MANAGER" "${FM_OPTIONS[@]}"
+                ;;
+            --noninteractive)        NONINTERACTIVE=1 ;;
             --prefix=*)
                 PREFIX="${1#--prefix=}"
                 NO_PACKAGES=1; NO_GPU=1; NO_WIFI=1
@@ -111,10 +148,17 @@ COMPONENTS
   --aur-helper=paru|yay             Override AUR helper detection.
   --display-manager=sddm|greetd|none  (default: sddm)
   --no-display-manager              Equivalent to --display-manager=none
-  --with-kde-apps                   Include dolphin, ark, ffmpegthumbs.
+  --with-kde-apps                   Include ark, ffmpegthumbs.
   --with-tlp                        Use TLP instead of PPD (laptop only).
   --with-noise-suppression          Enable WirePlumber RNNoise profile.
   --on-conflict=overwrite|skip|abort  Symlink conflict default (CI: abort).
+
+USER CHOICES (interactive prompt if omitted in a tty)
+  --kb-layout=us|latam,us|es|fr|de|br|gb   Hyprland kb_layout (default: us)
+  --with-browser=brave-bin|firefox|chromium    Default: brave-bin
+  --with-file-manager=dolphin|nautilus|thunar|nemo|pcmanfm-gtk3
+                                                Default: dolphin
+  --noninteractive                  Skip prompts; use defaults / flag values.
 
 TESTING
   --optimize-mirrors                Reflector-based mirror sort.
@@ -131,6 +175,69 @@ EOF
 
 print_version() {
     cat "$REPO_ROOT/VERSION" 2>/dev/null || printf '%s\n' "${WIRED_DOTS_VERSION:-unknown}"
+}
+
+# ── User choice prompts (interactive only) ───────────────────────────────────
+# Defaults applied here when neither flag nor prompt set a value, so tests and
+# --noninteractive runs are deterministic.
+KB_LAYOUT_DEFAULT="us"
+BROWSER_DEFAULT="brave-bin"
+FM_DEFAULT="dolphin"
+
+_prompt_choice() {
+    # _prompt_choice <label> <default> <options-array-name>
+    # Reads user pick from stdin; falls back to default on empty/EOF.
+    local label="$1" default="$2" arr_name="$3"
+    local -n options="$arr_name"
+    local opt i=1 default_idx=1
+    echo "" >&2
+    echo "  ${label}:" >&2
+    for opt in "${options[@]}"; do
+        if [[ "$opt" == "$default" ]]; then
+            printf '    %d) %s  (default)\n' "$i" "$opt" >&2
+            default_idx="$i"
+        else
+            printf '    %d) %s\n' "$i" "$opt" >&2
+        fi
+        ((i++))
+    done
+    local pick=""
+    read -r -p "  pick [${default_idx}]: " pick </dev/tty 2>/dev/null || pick=""
+    if [[ -z "$pick" ]]; then
+        printf '%s' "$default"
+        return
+    fi
+    if ! [[ "$pick" =~ ^[0-9]+$ ]] || (( pick < 1 || pick > ${#options[@]} )); then
+        log_warn "  invalid pick '$pick', using default ($default)" >&2
+        printf '%s' "$default"
+        return
+    fi
+    printf '%s' "${options[pick-1]}"
+}
+
+interactive_prompts() {
+    # Skip prompts if non-interactive, dry-run, or stdin isn't a tty. Empty
+    # values then fall through to defaults in apply_user_choice_defaults().
+    if [[ "${NONINTERACTIVE:-0}" == "1" ]] || [[ "${DRY_RUN:-0}" == "1" ]]; then
+        return 0
+    fi
+    if [[ ! -t 0 ]] && [[ ! -r /dev/tty ]]; then
+        return 0
+    fi
+
+    echo ""
+    log_info "wired-dots — quick choices (Enter to accept defaults)"
+    [[ -z "$KB_LAYOUT" ]]         && KB_LAYOUT="$(_prompt_choice         "Keyboard layout" "$KB_LAYOUT_DEFAULT" KB_LAYOUT_OPTIONS)"
+    [[ -z "$WIRED_BROWSER" ]]     && WIRED_BROWSER="$(_prompt_choice     "Browser"         "$BROWSER_DEFAULT"  BROWSER_OPTIONS)"
+    [[ -z "$WIRED_FILE_MANAGER" ]]&& WIRED_FILE_MANAGER="$(_prompt_choice "File manager"   "$FM_DEFAULT"       FM_OPTIONS)"
+    echo ""
+}
+
+apply_user_choice_defaults() {
+    : "${KB_LAYOUT:=$KB_LAYOUT_DEFAULT}"
+    : "${WIRED_BROWSER:=$BROWSER_DEFAULT}"
+    : "${WIRED_FILE_MANAGER:=$FM_DEFAULT}"
+    log_info "user choices: kb_layout=$KB_LAYOUT  browser=$WIRED_BROWSER  file-manager=$WIRED_FILE_MANAGER"
 }
 
 # ── Log directory setup ───────────────────────────────────────────────────────
@@ -186,6 +293,8 @@ run_phases() {
     detect_bootloader >/dev/null 2>&1 || true
     detect_kernels    >/dev/null 2>&1 || true
     [[ -z "${AUR_HELPER:-}" ]] && detect_aur_helper >/dev/null 2>&1 || true
+
+    run_phase "02b_user_choices.sh" "02b · user choices"
 
     if [[ "$NO_PACKAGES" != "1" ]]; then
         run_phase "03a_pacman_tweaks.sh" "03a · pacman tweaks"
@@ -243,10 +352,13 @@ run_phases() {
 
 main() {
     parse_flags "$@"
+    interactive_prompts
+    apply_user_choice_defaults
     export DRY_RUN NONINTERACTIVE NO_PACKAGES NO_GPU NO_WIFI NO_BOOTLOADER
     export NO_DISPLAY_MANAGER NO_SERVICES DISPLAY_MANAGER GPU_OVERRIDE
     export FORCE_RTL_DKMS WITH_KDE_APPS WITH_TLP WITH_NOISE_SUPPRESSION
     export STRICT OPTIMIZE_MIRRORS ON_CONFLICT PREFIX
+    export KB_LAYOUT WIRED_BROWSER WIRED_FILE_MANAGER
     run_phases
 }
 
