@@ -9,7 +9,7 @@ This document will be filled in as M4 lands. Intended structure:
 
 ## Staged transition
 
-1. Clone wired-dots: `git clone https://github.com/cativo23/wired-dots.git ~/wired-dots`
+1. Clone wired-dots (with submodules for the wallpaper pack): `git clone --recurse-submodules https://github.com/cativo23/wired-dots.git ~/wired-dots`
 2. Smoke-test against a disposable prefix: `cd ~/wired-dots && ./install.sh --prefix=/tmp/wired-test`
 3. Inspect `/tmp/wired-test/.config/` — confirm symlinks point where you expect.
 4. Uninstall the old framework's symlinks: (framework-specific, add steps here as framework integrations land)

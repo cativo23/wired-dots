@@ -138,35 +138,62 @@ rebuild_bat_cache() {
 }
 
 deploy_wallpapers() {
-    # Copy shipped wallpapers to ~/.config/wired-dots/wallpapers/. The default
-    # is applied at session start by Hyprland exec-once (`wallpaper set …`),
-    # not here — awww-daemon needs $WAYLAND_DISPLAY which doesn't exist yet.
+    # Copy wallpapers from source/wallpapers/ (which contains the curated
+    # submodule pack/ and may host repo-local extras) into ~/.config/wired-dots/
+    # wallpapers/, then point ~/.config/wired-dots/current at the first one
+    # alphabetically. Hyprland exec-once does `wallpaper set <current>` so
+    # the choice persists across reboots without re-applying defaults.
     local dst="$HOME/.config/wired-dots/wallpapers"
+    local current="$HOME/.config/wired-dots/current"
     local src="$REPO_ROOT/source/wallpapers"
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would deploy wallpapers to $dst"
+        log_info "[dry-run] would deploy wallpapers to $dst and set current symlink"
         return 0
     fi
     mkdir -p "$dst"
 
-    # Collect shipped wallpapers via subshell with nullglob so unmatched globs
-    # disappear (the previous compgen brace-expand only ever checked *.jpg).
+    # Walk source/wallpapers/ recursively (submodule contents live under
+    # pack/<theme>/) and collect every image. nullglob via subshell isolates
+    # the shopt change from the parent script.
     local -a files
     mapfile -t files < <(
-        shopt -s nullglob
-        printf '%s\n' "$src"/*.jpg "$src"/*.jpeg "$src"/*.png "$src"/*.webp
+        find "$src" \
+            \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) \
+            -type f 2>/dev/null | sort
     )
 
     if (( ${#files[@]} > 0 )); then
-        cp -n "${files[@]}" "$dst/"
+        # Flatten into $dst — basename collisions are rare in curated packs;
+        # cp -n preserves the first one if a dup name appears.
+        local f
+        for f in "${files[@]}"; do
+            cp -n "$f" "$dst/"
+        done
         log_ok "deployed ${#files[@]} wallpaper(s) → $dst"
-    elif command -v magick &>/dev/null && [[ -z "$(ls -A "$dst" 2>/dev/null)" ]]; then
-        # imagemagick is in core.lst so this should work post-install
+    elif command -v magick &>/dev/null; then
+        log_warn "no wallpapers found under $src — submodule not cloned? generating fallback"
+        log_info "    (run: git submodule update --init --recursive)"
         magick -size 1920x1080 'gradient:#1a1b26-#16161e' \
             "$dst/tokyo-night-default.png" 2>/dev/null \
-            && log_ok "generated default Tokyo Night wallpaper → $dst/tokyo-night-default.png"
+            && log_ok "generated fallback gradient → $dst/tokyo-night-default.png"
     else
         log_skip "no wallpapers shipped + magick unavailable — wallpaper dir left empty"
+        return 0
+    fi
+
+    # Point current symlink at the first wallpaper alphabetically (idempotent —
+    # leave existing valid symlink alone so user's selection survives re-runs).
+    if [[ -L "$current" ]] && [[ -e "$current" ]]; then
+        log_skip "wallpaper current symlink already valid → $current"
+    else
+        local first
+        first=$(find "$dst" -maxdepth 1 -type f \
+            \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) \
+            2>/dev/null | sort | head -n 1)
+        if [[ -n "$first" ]]; then
+            ln -sfn "$first" "$current"
+            log_ok "current → $(basename "$first")"
+        fi
     fi
 }
 

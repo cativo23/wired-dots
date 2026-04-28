@@ -113,21 +113,75 @@ _stage_repo() {
     [ ! -f "$stage/waybar/defaults.css" ]
 }
 
-@test "deploy_wallpapers copies shipped wallpapers to ~/.config/wired-dots/wallpapers" {
+@test "deploy_wallpapers copies wallpapers from submodule pack/ recursively" {
     local stage; stage="$(_stage_repo)"
-    : > "$stage/source/wallpapers/tokyo-night-default.png"  # fixture
+    mkdir -p "$stage/source/wallpapers/pack/tokyo-night"
+    : > "$stage/source/wallpapers/pack/tokyo-night/aaa.png"
+    : > "$stage/source/wallpapers/pack/tokyo-night/bbb.jpg"
     REPO_ROOT="$stage" run bash -c "
         export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
         source '$stage/scripts/06_symlinks.sh'
         DRY_RUN=0 deploy_wallpapers
     "
     [ "$status" -eq 0 ]
-    [ -f "$TEST_TMP/.config/wired-dots/wallpapers/tokyo-night-default.png" ]
+    [ -f "$TEST_TMP/.config/wired-dots/wallpapers/aaa.png" ]
+    [ -f "$TEST_TMP/.config/wired-dots/wallpapers/bbb.jpg" ]
+}
+
+@test "deploy_wallpapers creates current symlink to first wallpaper alphabetically" {
+    local stage; stage="$(_stage_repo)"
+    mkdir -p "$stage/source/wallpapers/pack/tokyo-night"
+    : > "$stage/source/wallpapers/pack/tokyo-night/zzz.png"
+    : > "$stage/source/wallpapers/pack/tokyo-night/aaa.png"
+    REPO_ROOT="$stage" run bash -c "
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
+        source '$stage/scripts/06_symlinks.sh'
+        DRY_RUN=0 deploy_wallpapers
+    "
+    [ "$status" -eq 0 ]
+    [ -L "$TEST_TMP/.config/wired-dots/current" ]
+    target="$(readlink -f "$TEST_TMP/.config/wired-dots/current")"
+    [[ "$target" == *"/aaa.png" ]]
+}
+
+@test "deploy_wallpapers leaves valid current symlink alone (idempotent)" {
+    local stage; stage="$(_stage_repo)"
+    mkdir -p "$stage/source/wallpapers/pack/tokyo-night"
+    : > "$stage/source/wallpapers/pack/tokyo-night/aaa.png"
+    : > "$stage/source/wallpapers/pack/tokyo-night/bbb.png"
+    mkdir -p "$TEST_TMP/.config/wired-dots/wallpapers"
+    : > "$TEST_TMP/.config/wired-dots/wallpapers/bbb.png"
+    ln -s "$TEST_TMP/.config/wired-dots/wallpapers/bbb.png" "$TEST_TMP/.config/wired-dots/current"
+
+    REPO_ROOT="$stage" run bash -c "
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
+        source '$stage/scripts/06_symlinks.sh'
+        DRY_RUN=0 deploy_wallpapers
+    "
+    [ "$status" -eq 0 ]
+    target="$(readlink -f "$TEST_TMP/.config/wired-dots/current")"
+    [[ "$target" == *"/bbb.png" ]]  # preserved user choice, not reset to alphabetical first
+}
+
+@test "deploy_wallpapers magick fallback when source/wallpapers/ has no images" {
+    local stage; stage="$(_stage_repo)"
+    # source/wallpapers/ exists in stage but has no image files (submodule not cloned)
+    REPO_ROOT="$stage" run bash -c "
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
+        source '$stage/scripts/06_symlinks.sh'
+        DRY_RUN=0 deploy_wallpapers
+    "
+    [ "$status" -eq 0 ]
+    if command -v magick >/dev/null 2>&1; then
+        [ -f "$TEST_TMP/.config/wired-dots/wallpapers/tokyo-night-default.png" ]
+        [[ "$output" == *"submodule not cloned"* ]]
+    fi
 }
 
 @test "deploy_wallpapers DRY_RUN=1 creates nothing" {
     local stage; stage="$(_stage_repo)"
-    : > "$stage/source/wallpapers/tokyo-night-default.png"
+    mkdir -p "$stage/source/wallpapers/pack/tokyo-night"
+    : > "$stage/source/wallpapers/pack/tokyo-night/aaa.png"
     REPO_ROOT="$stage" run bash -c "
         export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
         source '$stage/scripts/06_symlinks.sh'
@@ -135,4 +189,5 @@ _stage_repo() {
     "
     [ "$status" -eq 0 ]
     [ ! -d "$TEST_TMP/.config/wired-dots/wallpapers" ]
+    [ ! -L "$TEST_TMP/.config/wired-dots/current" ]
 }

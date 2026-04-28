@@ -32,10 +32,15 @@ _Screenshots land here once the installer deploys a working desktop._
 ## Quick Start
 
 ```bash
-git clone https://github.com/cativo23/wired-dots.git ~/wired-dots
+git clone --recurse-submodules https://github.com/cativo23/wired-dots.git ~/wired-dots
 cd ~/wired-dots
 ./install.sh
 ```
+
+> The `--recurse-submodules` flag pulls the curated Tokyo Night wallpaper pack
+> shipped under `source/wallpapers/pack/`. Skipping it leaves you with a
+> magick-generated dark gradient as the only wallpaper. Already cloned without
+> it? Run `git submodule update --init --recursive` from the repo root.
 
 ## What you get
 
