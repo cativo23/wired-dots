@@ -19,7 +19,7 @@
 [![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-5046e4?style=flat)](https://hyprland.org/)
 [![ShellCheck](https://img.shields.io/badge/shellcheck-passing-brightgreen?style=flat)](https://github.com/cativo23/wired-dots/actions)
 
-> **Status:** v1.0.0-rc2 — installer complete and live-validated end-to-end
+> **Status:** v1.0.0-rc3 — installer complete, choice flags landed, audit cycle done
 
 </div>
 
@@ -121,6 +121,7 @@ See [docs/troubleshooting.md](docs/troubleshooting.md).
 | M4 | Config corpus | 🔲 in progress |
 | RC | v1.0.0-rc1 release candidate | ✅ complete |
 | RC | v1.0.0-rc2 — wallpaper + waybar + PATH + uninstaller fixes | ✅ complete |
+| RC | v1.0.0-rc3 — audit cycle: strip personal, add choice flags, smoke test | ✅ complete |
 | 1.0 | Stable release | 🔲 pending |
 
 ## Contributing

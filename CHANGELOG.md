@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc3] — 2026-04-28
+
+The "audit cycle" — Carlos asked for an honest review of what was personal-Carlos noise vs reusable framework, plus the visible waybar bugs that had been broken since rc1. Result: 7 focused PRs that strip the personal layer, parameterize the install, and add a static smoke test that catches the bug class in CI.
+
+### Added
+
+- **Waybar built-in module configs** — eight new files (`cpu`, `memory`, `temperature`, `backlight`, `battery`, `pulseaudio`, `idle_inhibitor`, `clock`) with Tokyo Night Nerd Font glyphs and click handlers wired to plain CLI tools (`pamixer`, `brightnessctl`, `playerctl`). No `hyde-shell` dependency.
+- **Installer choice flags** — `--kb-layout=us|latam,us|es|fr|de|br|gb` (default `us`), `--with-browser=brave-bin|firefox|chromium` (default `brave-bin`), `--with-file-manager=dolphin|nautilus|thunar|nemo|pcmanfm-gtk3` (default `dolphin`). Interactive prompt when stdin is a tty; `--noninteractive` skips. Choices persist to `~/.cache/wired-dots/user-choices.conf`. New phase `02b_user_choices.sh` writes a Hyprland-side `local-overrides.conf` defining `$BROWSER`, `$FILE_MANAGER`, and the `input { kb_layout = … }` block; keybindings dispatch via Hyprland variables. Package→binary translation table (`brave-bin→brave`, `pcmanfm-gtk3→pcmanfm`).
+- **Hardware-aware TLP** (`--with-tlp`) — finally actually does what the flag advertised since rc1. New phase `04e_power.sh` installs the base config, detects `/sys/class/power_supply/BAT?/charge_control_*_threshold` and writes a charge-threshold overlay only on hardware that supports it. `03b` filters PPD out of the install list and adds `tlp + tlp-rdw`. `10a` swap_power_service disables PPD, enables tlp.
+- **zsh defaults split** — three layers now: `wired-defaults.zsh` (framework, refreshed every install), `user.zsh.example` (one-time copy, user-owned thereafter), `user.local.zsh.example` (gitignored secrets). Carlos's `cdp/cdw/lsp/lsw` aliases + `mkpersonal/mkwork/archive_project` ship as the starter `user.zsh` content; user edits survive future installs.
+- **Waybar smoke test in CI** (`tests/test_waybar_smoke.bats`) — pure jq + grep static checks against the bug class that hit rc1 and rc2: `$XDG_CONFIG_HOME` literal in includes, empty `format-icons` arrays, `{}+named-placeholder` mixing, dead `bin/` references. 10 tests, ~30 lines apiece. None require waybar to run.
+- **`docs/optional-modules.md`** — recipes for re-adding the Claude Code waybar module and a profile picture in hyprlock for users who want them.
+
+### Fixed
+
+- **Waybar custom modules silently broken since rc1**: `include` paths used `$XDG_CONFIG_HOME` but Hyprland-launched waybar inherits no `XDG_CONFIG_HOME` from SDDM. Every include silently failed, every custom module rendered as an unconfigured name. Switched to `$HOME/.config/waybar/*` which is always set.
+- **`custom/swaync` format error on libfmt 10+**: `"format": "{icon} {}"` mixes positional and named placeholders. Replaced `{}` with `{text}`.
+- **Mediaplayer empty fallback**: shows `󰐎 idle` when no MPRIS player is active so the slot has visible state.
+- **`custom/gpuinfo` invisible on AMD without `gpu_busy_percent`**: rewrote exec script to always emit a non-empty string (`n/a` when no GPU usage interface).
+- **Spacing too tight in the right cluster** (10 modules in one panel): bumped per-module padding `0 4px → 0 7-8px`, font-size `10 → 12px` on icon-bearing modules, added missing `#custom-swaync` and `#custom-uptime` selectors.
+- **TLP `DISK_DEVICES` hardcoded** to Carlos's disk layout: removed (TLP auto-discovers `/sys/block` when absent). **Charge thresholds for `BAT0`** moved to a hardware-gated overlay file (only written if the kernel exposes the interface).
+- **`bindkey -e` commented as "Vi keys"** when it's actually emacs: corrected.
+
+### Changed
+
+- **Waybar layout: file-level symlinks** (no more whole-dir symlink + cp-into-source). `~/.config/waybar/` is a real directory; subdirs and the active layout/style/defaults are symlinks pointing at canonical files under `repo/waybar/`. Switching layouts post-install: `ln -sfn layouts/<other>.jsonc ~/.config/waybar/config.jsonc`.
+- **zsh layout: hybrid file-level symlinks** (no more whole-dir symlink). `~/.config/zsh/` is a real directory; `.zshrc` and `wired-defaults.zsh` symlinked, `user.zsh` and `user.local.zsh` one-time-copied. Migration path: existing dir-symlink installs auto-upgrade on the next `./install.sh`.
+
+### Removed
+
+- **Personal assets baked into the default ship**:
+  - `bin/waybar-claude-code` + `waybar/modules/custom-claude-code.jsonc` (Claude API integration; recipe in `docs/optional-modules.md`)
+  - `hypr/hyprlock/backgrounds/profile_square.png` (personal photo); the silent-rei layout's image block is now commented out with opt-in instructions
+  - `fastfetch/logo/pokemon_logo.txt` → replaced with `wired-dots.txt`, a Tokyo Night ANSI banner
+  - `waybar/user-style.css` (orphan file, never `@import`'d)
+- **`pwvucontrol`** dropped from `aur.lst` — broken upstream against current pipewire libspa. `pavucontrol` (already in `core.lst`) covers the same role.
+- **`nautilus` and `dolphin`** — both were shipped unconditionally. Now driven by `--with-file-manager=…`.
+- **`brave-bin`** — was shipped unconditionally. Now driven by `--with-browser=…`.
+
+### CI
+
+- New `arch-test.yml` dependency: `jq` (used by the waybar smoke test).
+- Existing `ubuntu` runner already has jq; nothing else changed.
+
 ## [1.0.0-rc2] — 2026-04-27
 
 ### Added
