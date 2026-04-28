@@ -16,12 +16,14 @@ export REPO_ROOT SCRIPTS_DIR
 # shellcheck source=scripts/global_fn.sh
 source "$SCRIPTS_DIR/global_fn.sh"
 
-# Mirrors 06_symlinks.sh CONFIG_DIRS + 01_backup.sh BACKUP_CONFIG_DIRS.
+# Mirrors 06_symlinks.sh CONFIG_DIRS. zsh/ is handled separately because it
+# uses a hybrid layout (symlinks + one-time copies).
 CONFIG_DIRS=(
-    hypr waybar kitty starship fastfetch zsh swaync rofi wlogout
+    hypr waybar kitty starship fastfetch swaync rofi wlogout
     bat gtk-3.0 gtk-4.0 qt5ct qt6ct Kvantum xdg-desktop-portal
     wireplumber git
 )
+ZSH_MANAGED_FILES=( .zshrc wired-defaults.zsh )
 HOME_DOTFILES=( .zshenv .gtkrc-2.0 )
 BIN_FILES=( cliphist-rofi power-profile-switch screenshot.sh wallpaper )
 
@@ -50,6 +52,29 @@ remove_symlinks_from() {
         fi
     done
     log_info "$label: removed $removed symlink(s)"
+}
+
+remove_zsh_symlinks() {
+    # Unlink the wired-managed zsh files but LEAVE the user-owned files
+    # (user.zsh, user.local.zsh) alone — they may contain user edits and
+    # secrets.
+    local zsh_dir="$HOME/.config/zsh"
+    [[ -d "$zsh_dir" ]] || return 0
+    local removed=0
+    local f target
+    for f in "${ZSH_MANAGED_FILES[@]}"; do
+        target="$zsh_dir/$f"
+        if [[ -L "$target" ]]; then
+            if [[ "${DRY_RUN:-0}" == "1" ]]; then
+                log_info "[dry-run] would unlink: $target"
+            else
+                rm -f "$target"
+                log_ok "removed symlink: $target"
+            fi
+            (( removed++ )) || true
+        fi
+    done
+    log_info "zsh: removed $removed wired symlink(s); user files preserved"
 }
 
 remove_runtime_artifacts() {
@@ -148,6 +173,7 @@ EOF
 main() {
     log_step "uninstall" "wired-dots M0 minimum viable"
     remove_symlinks_from "configs"       "$HOME/.config"    "${CONFIG_DIRS[@]}"
+    remove_zsh_symlinks
     remove_symlinks_from "home dotfiles" "$HOME"            "${HOME_DOTFILES[@]}"
     remove_symlinks_from "bin"           "$HOME/.local/bin" "${BIN_FILES[@]}"
     remove_runtime_artifacts

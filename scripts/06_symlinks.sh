@@ -14,7 +14,6 @@ CONFIG_DIRS=(
     kitty
     starship
     fastfetch
-    zsh
     swaync
     rofi
     wlogout
@@ -28,6 +27,8 @@ CONFIG_DIRS=(
     wireplumber
     git
 )
+# zsh/ is intentionally NOT here — it uses a hybrid layout (wired-managed
+# files symlinked, user-owned files one-time-copied) handled by deploy_zsh().
 
 link_config_dirs() {
     mkdir -p "$HOME/.config"
@@ -39,6 +40,58 @@ link_config_dirs() {
             continue
         fi
         symlink_safe "$src" "$dst"
+    done
+}
+
+deploy_zsh() {
+    # zsh/ uses a hybrid layout to keep user edits across re-runs:
+    #   - .zshrc, wired-defaults.zsh  → symlinks (always wired-managed)
+    #   - user.zsh, user.local.zsh    → copied ONCE from .example templates,
+    #                                   never overwritten if already present
+    local src="$REPO_ROOT/zsh"
+    local dst="$HOME/.config/zsh"
+    if [[ ! -d "$src" ]]; then
+        log_skip "zsh/ source dir not found"
+        return 0
+    fi
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would deploy zsh/ via hybrid layout to $dst"
+        return 0
+    fi
+
+    # Migration: previous wired-dots versions whole-dir-symlinked ~/.config/zsh
+    # to repo/zsh/. Drop that symlink so we can rebuild as a real directory
+    # with file-level symlinks. The repo previously also shipped user.zsh as
+    # a tracked file; that content is now identical to user.zsh.example so
+    # nothing of value is lost when the symlink is replaced.
+    if [[ -L "$dst" ]]; then
+        log_warn "migrating zsh/ from whole-dir symlink to hybrid layout"
+        rm -f "$dst"
+    fi
+
+    mkdir -p "$dst"
+
+    # Wired-managed files — symlink (refresh on every install)
+    local f
+    for f in .zshrc wired-defaults.zsh; do
+        if [[ -f "$src/$f" ]]; then
+            symlink_safe "$src/$f" "$dst/$f"
+        fi
+    done
+
+    # User-owned templates — copy ONCE then leave alone
+    local tmpl target
+    for tmpl in user.zsh.example user.local.zsh.example; do
+        target="${tmpl%.example}"
+        if [[ ! -f "$src/$tmpl" ]]; then
+            continue
+        fi
+        if [[ -e "$dst/$target" ]]; then
+            log_skip "preserving existing $dst/$target"
+        else
+            cp "$src/$tmpl" "$dst/$target"
+            log_ok "seeded $dst/$target from template (edit freely; future installs won't overwrite)"
+        fi
     done
 }
 
@@ -200,6 +253,7 @@ deploy_wallpapers() {
 main() {
     log_step "06" "symlinks"
     link_config_dirs
+    deploy_zsh
     activate_waybar_layout
     link_home_dotfiles
     link_bin_files
