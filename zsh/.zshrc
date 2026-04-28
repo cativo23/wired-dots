@@ -1,4 +1,9 @@
-# wired-dots — zsh entry point (sourced when ZDOTDIR points here)
+# wired-dots — zsh entry point (sourced when ZDOTDIR=$HOME/.config/zsh)
+#
+# Source order — earlier wins on PATH/PROMPT, later wins on aliases:
+#   1. wired-defaults.zsh   wired-dots-managed; refreshed on every install
+#   2. user.zsh             user-owned; copied once on first install
+#   3. user.local.zsh       gitignored; machine-specific (sourced from user.zsh)
 
 # History
 HISTFILE="${ZDOTDIR:-$HOME/.config/zsh}/.zsh_history"
@@ -11,10 +16,14 @@ autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
-# Vi keys
+# Emacs keybindings (zsh default; explicit so themes/users see the choice).
 bindkey -e
 
-# Project / tool aliases + functions
+# Wired-managed framework defaults (always synced)
+[[ -f "${ZDOTDIR:-$HOME/.config/zsh}/wired-defaults.zsh" ]] && \
+    source "${ZDOTDIR:-$HOME/.config/zsh}/wired-defaults.zsh"
+
+# User-owned config (one-time copy on install; user.local.zsh sourced from here)
 [[ -f "${ZDOTDIR:-$HOME/.config/zsh}/user.zsh" ]] && \
     source "${ZDOTDIR:-$HOME/.config/zsh}/user.zsh"
 

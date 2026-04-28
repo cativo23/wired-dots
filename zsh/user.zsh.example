@@ -1,0 +1,48 @@
+# shellcheck shell=bash
+# wired-dots — user-owned zsh config
+#
+# This file is copied to ~/.config/zsh/user.zsh ONCE on first install and
+# never touched again. Edit freely; updates won't clobber your changes.
+# Reset to defaults: rm ~/.config/zsh/user.zsh && ./install.sh
+#
+# Sourced AFTER wired-defaults.zsh, so anything here overrides framework
+# defaults (e.g. you can set EDITOR=vim here and it wins). Sourced BEFORE
+# user.local.zsh, which is for machine-specific secrets and is gitignored.
+
+# ── Project navigation ───────────────────────────────────────────────────────
+# Adjust the paths below to match your own layout, or delete the block.
+alias cdp='cd ~/projects/personal'
+alias cdw='cd ~/projects/work'
+alias lsp='ls -1 ~/projects/personal'
+alias lsw='ls -1 ~/projects/work'
+
+mkpersonal() {
+    mkdir -p ~/projects/personal/"$1" && cd ~/projects/personal/"$1" || return
+}
+
+mkwork() {
+    mkdir -p ~/projects/work/"$1"/"$2" && cd ~/projects/work/"$1"/"$2" || return
+}
+
+archive_project() {
+    if [[ -d ~/projects/work/"$1"/"$2" ]]; then
+        mv ~/projects/work/"$1"/"$2" ~/projects/archives/
+        echo "Archived: $2"
+    elif [[ -d ~/projects/personal/"$1" ]]; then
+        mv ~/projects/personal/"$1" ~/projects/archives/
+        echo "Archived: $1"
+    else
+        echo "Project not found" >&2
+        return 1
+    fi
+}
+
+# ── Tool aliases ─────────────────────────────────────────────────────────────
+# `cat` shadowed to use bat with the Tokyo Night theme. Comment out if you'd
+# rather have plain `cat` (e.g. for piping where bat's pager surprises you).
+alias cat='bat --theme=tokyonight_night'
+
+# ── Machine-local overrides ──────────────────────────────────────────────────
+# user.local.zsh is gitignored — drop tokens, VPN aliases, machine paths there.
+[[ -f "${ZDOTDIR:-$HOME/.config/zsh}/user.local.zsh" ]] && \
+    source "${ZDOTDIR:-$HOME/.config/zsh}/user.local.zsh"
