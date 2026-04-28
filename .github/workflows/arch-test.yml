@@ -16,7 +16,7 @@ jobs:
           pacman-key --init
           pacman-key --populate archlinux
           pacman -Syu --noconfirm
-          pacman -S --noconfirm --needed bats shellcheck git
+          pacman -S --noconfirm --needed bats shellcheck git jq
 
       - uses: actions/checkout@v4
 
