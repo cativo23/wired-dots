@@ -1,0 +1,27 @@
+{
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-bluetooth": "{icon} {volume}%",
+    "format-bluetooth-muted": "󰝟 {icon}",
+    "format-muted": "󰝟",
+    "format-source": " {volume}%",
+    "format-source-muted": "",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["󰕿", "󰖀", "󰕾"]
+    },
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "on-click-right": "pamixer -t",
+    "on-click-middle": "pamixer --default-source -t",
+    "on-scroll-up": "pamixer -i 5",
+    "on-scroll-down": "pamixer -d 5",
+    "tooltip": true,
+    "tooltip-format": "{desc} — {volume}%\nLeft: pavucontrol\nRight: mute output\nMiddle: mute mic"
+  }
+}

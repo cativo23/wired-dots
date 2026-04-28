@@ -1,11 +1,10 @@
 {
   "custom/gpuinfo": {
-    "exec": "if command -v nvidia-smi >/dev/null 2>&1; then u=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | tr -d ' ' | head -1); [ -n \"$u\" ] && echo \"$u\" || echo \"—\"; elif [ -r /sys/class/drm/card0/device/gpu_busy_percent ]; then cat /sys/class/drm/card0/device/gpu_busy_percent; elif [ -r /sys/class/drm/card1/device/gpu_busy_percent ]; then cat /sys/class/drm/card1/device/gpu_busy_percent; else echo \"—\"; fi",
-    "format": "󰢮 {}%",
+    "exec": "if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | tr -d ' ' | head -1 | awk 'NF{print $0\"%\"; exit} END{if(NR==0)print \"n/a\"}'; elif [ -r /sys/class/drm/card0/device/gpu_busy_percent ]; then echo \"$(cat /sys/class/drm/card0/device/gpu_busy_percent)%\"; elif [ -r /sys/class/drm/card1/device/gpu_busy_percent ]; then echo \"$(cat /sys/class/drm/card1/device/gpu_busy_percent)%\"; else echo \"n/a\"; fi",
+    "format": "󰢮 {}",
     "interval": 5,
     "tooltip": true,
-    "tooltip-format": "GPU: {}",
-    "exec-on-event": false,
-    "class": "gpuinfo"
+    "tooltip-format": "GPU usage: {}",
+    "exec-on-event": false
   }
 }

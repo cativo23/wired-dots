@@ -1,0 +1,23 @@
+{
+  "clock": {
+    "format": "󰥔 {:%H:%M}",
+    "format-alt": "󰸗 {:%a %d %b %Y}",
+    "tooltip": true,
+    "tooltip-format": "<span size='larger'><b>{:%A, %d %B %Y}</b></span>\n<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "on-scroll": 1,
+      "format": {
+        "months":   "<span color='#bb9af7'><b>{}</b></span>",
+        "weekdays": "<span color='#7aa2f7'><b>{}</b></span>",
+        "today":    "<span color='#f7768e'><b>{}</b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up":   "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  }
+}

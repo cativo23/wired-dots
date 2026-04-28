@@ -1,6 +1,6 @@
 {
   "custom/mediaplayer": {
-    "exec": "playerctl metadata --format '{{ artist }} — {{ title }}' 2>/dev/null || echo ''",
+    "exec": "playerctl metadata --format '{{ artist }} — {{ title }}' 2>/dev/null || echo '󰐎 idle'",
     "exec-if": "command -v playerctl >/dev/null 2>&1",
     "format": "{}",
     "interval": 2,

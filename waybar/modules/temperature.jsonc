@@ -1,0 +1,12 @@
+{
+  "temperature": {
+    "thermal-zone": 0,
+    "interval": 10,
+    "critical-threshold": 80,
+    "format": "{icon} {temperatureC}°",
+    "format-critical": "{icon} {temperatureC}°",
+    "format-icons": ["", "", "", "", ""],
+    "tooltip": true,
+    "tooltip-format": "Temperature: {temperatureC}°C ({temperatureF}°F)"
+  }
+}

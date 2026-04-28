@@ -10,8 +10,8 @@
     "margin-left": 6,
     "margin-right": 6,
     "include": [
-        "$XDG_CONFIG_HOME/waybar/modules/*json*",
-        "$XDG_CONFIG_HOME/waybar/includes/includes.json"
+        "$HOME/.config/waybar/modules/*json*",
+        "$HOME/.config/waybar/includes/includes.json"
     ],
     "modules-left": [
         "group/magi-panel",

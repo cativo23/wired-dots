@@ -3,7 +3,7 @@
     "exec": "swaync-client -swb 2>/dev/null",
     "exec-if": "command -v swaync-client >/dev/null 2>&1",
     "return-type": "json",
-    "format": "{icon} {}",
+    "format": "{icon} {text}",
     "format-icons": {
       "notification": "󱅫",
       "none": "󰂚",

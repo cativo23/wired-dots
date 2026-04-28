@@ -182,21 +182,21 @@ window#waybar.bottom #pill {
 
 #cpu {
     color: #f7768e;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 7px;
     text-shadow: 0 0 4px alpha(#f7768e, 0.25);
 }
 
 #memory {
     color: #bb9af7;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 7px;
 }
 
 #temperature {
     color: #7dcfff;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 7px;
 }
 
 #temperature.warning {
@@ -211,8 +211,8 @@ window#waybar.bottom #pill {
 
 #custom-gpuinfo {
     color: #9ece6a;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 7px;
 }
 
 /* ═══════════════════════════════════════════
@@ -263,15 +263,15 @@ window#waybar.bottom #pill {
 /* Backlight (laptop) */
 #backlight {
     color: #e0af68;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 8px;
 }
 
 /* System tray */
 #tray {
     color: #c0caf5;
     font-size: 10px;
-    padding: 0 4px;
+    padding: 0 8px;
 }
 
 #tray > .passive {
@@ -286,8 +286,8 @@ window#waybar.bottom #pill {
 /* Volume */
 #pulseaudio {
     color: #7dcfff;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 8px;
 }
 
 #pulseaudio.muted {
@@ -297,8 +297,8 @@ window#waybar.bottom #pill {
 /* Network */
 #network {
     color: #9ece6a;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 8px;
     text-shadow: 0 0 3px alpha(#9ece6a, 0.25);
 }
 
@@ -310,8 +310,8 @@ window#waybar.bottom #pill {
 /* Battery (laptop) */
 #battery {
     color: #9ece6a;
-    font-size: 10px;
-    padding: 0 4px;
+    font-size: 12px;
+    padding: 0 8px;
 }
 
 #battery.charging {
@@ -336,13 +336,34 @@ window#waybar.bottom #pill {
 /* Caffeine / Idle inhibitor */
 #idle_inhibitor {
     color: #565f89;
-    font-size: 10px;
-    padding: 0 3px;
+    font-size: 12px;
+    padding: 0 7px;
 }
 
 #idle_inhibitor.activated {
     color: #e0af68;
     text-shadow: 0 0 4px alpha(#e0af68, 0.4);
+}
+
+/* swaync notification bell */
+#custom-swaync {
+    color: #7aa2f7;
+    font-size: 12px;
+    padding: 0 8px;
+    text-shadow: 0 0 4px alpha(#7aa2f7, 0.3);
+}
+
+#custom-swaync:hover {
+    color: #c0caf5;
+    text-shadow: 0 0 6px alpha(#7aa2f7, 0.5);
+}
+
+/* Uptime readout */
+#custom-uptime {
+    color: #565f89;
+    font-size: 10px;
+    padding: 0 8px;
+    letter-spacing: 1px;
 }
 
 /* Updates & Dunst notifications */
@@ -373,13 +394,13 @@ window#waybar.bottom #pill {
     font-size: 12px;
     letter-spacing: 2px;
     text-shadow: 0 0 10px alpha(#7aa2f7, 0.5);
-    padding: 0 4px;
+    padding: 0 10px;
 }
 
 #custom-power {
     color: #f7768e;
-    font-size: 11px;
-    padding: 0 2px 0 4px;
+    font-size: 12px;
+    padding: 0 8px 0 10px;
 }
 
 #custom-power:hover {
