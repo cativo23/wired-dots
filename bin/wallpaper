@@ -1,47 +1,127 @@
 #!/usr/bin/env bash
-# wired-dots — wallpaper switcher
-# Ensures awww-daemon is running then sends command.
-# Usage: wallpaper [set <file>|next|prev]
+# wired-dots — wallpaper switcher (awww-backed)
+#
+# Tracks the active wallpaper as a symlink at:
+#   $WALLPAPER_DIR/../current
+# so the choice persists across reboots and Hyprland exec-once just needs:
+#   exec-once = wallpaper set ~/.config/wired-dots/current
+#
+# Subcommands:
+#   set <file> | -s <file>     set wallpaper to absolute file path
+#   next      | -n             next file (alphabetical) in $WALLPAPER_DIR
+#   prev      | -p             previous file
+#   restore   | -r             ensure daemon up + apply current symlink
+#   show                       print current target
+#   -h | --help                this help
+#
+# Uses a lockfile under $XDG_RUNTIME_DIR/wired-dots/ to avoid concurrent
+# awww commands fighting (e.g. user spamming next-key).
+
 set -euo pipefail
 
 WALLPAPER_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wired-dots/wallpapers"
+CURRENT_LINK="${XDG_CONFIG_HOME:-$HOME/.config}/wired-dots/current"
+LOCK_DIR="${XDG_RUNTIME_DIR:-/tmp}/wired-dots"
+LOCK_FILE="$LOCK_DIR/wallpaper.lock"
 
-ensure_daemon() {
-    pgrep -x awww-daemon >/dev/null 2>&1 || { awww-daemon & sleep 0.5; }
+acquire_lock() {
+    mkdir -p "$LOCK_DIR"
+    if ! ( set -o noclobber; : > "$LOCK_FILE" ) 2>/dev/null; then
+        echo "wallpaper: another instance is running ($LOCK_FILE)" >&2
+        exit 1
+    fi
+    trap 'rm -f "$LOCK_FILE"' EXIT
 }
 
-case "${1:-}" in
-    set)
-        [ -z "${2:-}" ] && { echo "Usage: wallpaper set <file>" >&2; exit 1; }
-        ensure_daemon
-        awww img "$2"
-        ;;
-    next)
-        ensure_daemon
-        mapfile -t walls < <(find "$WALLPAPER_DIR" -maxdepth 1 \
-            \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) | sort)
-        [ "${#walls[@]}" -eq 0 ] && { echo "No wallpapers in $WALLPAPER_DIR" >&2; exit 1; }
-        current=$(awww query img 2>/dev/null || echo "")
-        idx=0
-        for i in "${!walls[@]}"; do
-            [[ "${walls[$i]}" == "$current" ]] && idx=$(( (i + 1) % ${#walls[@]} )) && break
-        done
-        awww img "${walls[$idx]}"
-        ;;
-    prev)
-        ensure_daemon
-        mapfile -t walls < <(find "$WALLPAPER_DIR" -maxdepth 1 \
-            \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) | sort)
-        [ "${#walls[@]}" -eq 0 ] && { echo "No wallpapers in $WALLPAPER_DIR" >&2; exit 1; }
-        current=$(awww query img 2>/dev/null || echo "")
-        idx=$(( ${#walls[@]} - 1 ))
-        for i in "${!walls[@]}"; do
-            [[ "${walls[$i]}" == "$current" ]] && idx=$(( (i - 1 + ${#walls[@]}) % ${#walls[@]} )) && break
-        done
-        awww img "${walls[$idx]}"
-        ;;
-    "")
-        echo "Usage: wallpaper set <file>|next|prev" >&2; exit 1 ;;
-    *)
-        echo "Unknown command: $1" >&2; exit 1 ;;
-esac
+ensure_daemon() {
+    if pgrep -x awww-daemon >/dev/null 2>&1; then return 0; fi
+    awww-daemon --format xrgb &>/dev/null &
+    disown
+    # Wait up to ~2s for the socket
+    local i
+    for i in 1 2 3 4 5 6 7 8; do
+        sleep 0.25
+        awww query &>/dev/null && break
+    done
+}
+
+apply_image() {
+    local file="$1"
+    [[ -f "$file" ]] || { echo "wallpaper: file not found: $file" >&2; exit 1; }
+    ensure_daemon
+    awww img "$file"
+}
+
+set_current_link() {
+    local file="$1"
+    mkdir -p "$(dirname "$CURRENT_LINK")"
+    ln -sfn "$file" "$CURRENT_LINK"
+}
+
+list_walls() {
+    [[ -d "$WALLPAPER_DIR" ]] || { echo "wallpaper: $WALLPAPER_DIR not found" >&2; exit 1; }
+    find "$WALLPAPER_DIR" -maxdepth 1 \
+        \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) \
+        -type f -o -type l | sort
+}
+
+cmd_set() {
+    local file
+    file="$(readlink -f "$1")"
+    apply_image "$file"
+    set_current_link "$file"
+}
+
+cmd_step() {
+    local direction="$1"  # +1 or -1
+    mapfile -t walls < <(list_walls)
+    (( ${#walls[@]} > 0 )) || { echo "wallpaper: no wallpapers in $WALLPAPER_DIR" >&2; exit 1; }
+    local cur idx=0
+    cur="$(readlink -f "$CURRENT_LINK" 2>/dev/null || true)"
+    local i
+    for i in "${!walls[@]}"; do
+        if [[ "${walls[$i]}" == "$cur" ]]; then
+            idx=$(( (i + direction + ${#walls[@]}) % ${#walls[@]} ))
+            break
+        fi
+    done
+    cmd_set "${walls[$idx]}"
+}
+
+cmd_restore() {
+    if [[ ! -L "$CURRENT_LINK" ]] || [[ ! -e "$CURRENT_LINK" ]]; then
+        echo "wallpaper: no valid current link at $CURRENT_LINK" >&2
+        exit 1
+    fi
+    apply_image "$(readlink -f "$CURRENT_LINK")"
+}
+
+cmd_show() {
+    if [[ -L "$CURRENT_LINK" ]] && [[ -e "$CURRENT_LINK" ]]; then
+        readlink -f "$CURRENT_LINK"
+    else
+        echo "wallpaper: no current set" >&2
+        exit 1
+    fi
+}
+
+usage() {
+    sed -n '2,/^$/p' "$0" | sed 's/^# \?//'
+    exit "${1:-0}"
+}
+
+main() {
+    case "${1:-}" in
+        -s|set)
+            [[ -n "${2:-}" ]] || { echo "Usage: wallpaper set <file>" >&2; exit 1; }
+            acquire_lock; cmd_set "$2" ;;
+        -n|next)     acquire_lock; cmd_step 1 ;;
+        -p|prev)     acquire_lock; cmd_step -1 ;;
+        -r|restore)  acquire_lock; cmd_restore ;;
+        show)        cmd_show ;;
+        -h|--help|"") usage 0 ;;
+        *) echo "wallpaper: unknown command: $1" >&2; usage 1 ;;
+    esac
+}
+
+main "$@"

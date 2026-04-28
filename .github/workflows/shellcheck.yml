@@ -18,4 +18,4 @@ jobs:
         with:
           scandir: '.'
           format: gcc
-          ignore_paths: docs source/wallpapers tests zsh
+          ignore_paths: docs source/wallpapers source/wallpapers/pack tests zsh

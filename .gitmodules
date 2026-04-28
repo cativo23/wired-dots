@@ -1,0 +1,3 @@
+[submodule "source/wallpapers/pack"]
+	path = source/wallpapers/pack
+	url = https://github.com/cativo23/wallpapers.git
