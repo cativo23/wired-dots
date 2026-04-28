@@ -149,7 +149,11 @@ COMPONENTS
   --display-manager=sddm|greetd|none  (default: sddm)
   --no-display-manager              Equivalent to --display-manager=none
   --with-kde-apps                   Include ark, ffmpegthumbs.
-  --with-tlp                        Use TLP instead of PPD (laptop only).
+  --with-tlp                        Install tlp + tlp-rdw, remove PPD,
+                                    and write /etc/tlp.d/99-wired*.conf.
+                                    Charge thresholds emitted only on
+                                    hardware that exposes the kernel
+                                    interface (ThinkPads, some Dell/HP).
   --with-noise-suppression          Enable WirePlumber RNNoise profile.
   --on-conflict=overwrite|skip|abort  Symlink conflict default (CI: abort).
 
@@ -326,6 +330,8 @@ run_phases() {
     else
         log_skip "GPU install skipped (--no-gpu)"
     fi
+
+    run_phase "04e_power.sh" "04e · power management"
 
     [[ "$NO_WIFI" != "1" ]] && run_phase "05_wifi.sh" "05 · WiFi" || log_skip "WiFi skipped"
 
