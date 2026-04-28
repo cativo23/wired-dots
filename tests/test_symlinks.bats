@@ -29,11 +29,13 @@ teardown() { rm -rf "$TEST_TMP"; }
     [ -L "$TEST_TMP/.config/hypr" ]
 }
 
-@test "link_config_dirs creates ~/.config/waybar symlink" {
+@test "link_config_dirs no longer creates a whole-dir waybar symlink" {
+    # Since PR G waybar/ uses a file-level deploy via deploy_waybar(); the
+    # generic CONFIG_DIRS-based whole-dir symlink would conflict with that.
     source "$REPO_ROOT/scripts/06_symlinks.sh"
     DRY_RUN=0 ON_CONFLICT=overwrite run link_config_dirs
     [ "$status" -eq 0 ]
-    [ -L "$TEST_TMP/.config/waybar" ]
+    [ ! -e "$TEST_TMP/.config/waybar" ]
 }
 
 @test "link_home_dotfiles skips gracefully when home/ is empty" {
@@ -63,11 +65,13 @@ teardown() { rm -rf "$TEST_TMP"; }
 }
 
 # Helper: stage an isolated repo tree under TEST_TMP/repo so functions that
-# write into REPO_ROOT (activate_waybar_layout) don't dirty the real worktree.
+# would otherwise touch REPO_ROOT don't dirty the real worktree. Same shape
+# as the production layout: waybar/{layouts,styles,modules,includes}.
 _stage_repo() {
     local stage="$TEST_TMP/repo"
-    mkdir -p "$stage/waybar/layouts" "$stage/waybar/styles" "$stage/scripts" \
-             "$stage/source/wallpapers" "$stage/bin"
+    mkdir -p "$stage/waybar/layouts" "$stage/waybar/styles" \
+             "$stage/waybar/modules" "$stage/waybar/includes" \
+             "$stage/scripts" "$stage/source/wallpapers" "$stage/bin"
     cp "$REPO_ROOT/scripts/global_fn.sh" "$stage/scripts/"
     cp "$REPO_ROOT/scripts/06_symlinks.sh" "$stage/scripts/"
     cp "$REPO_ROOT/waybar/layouts/cyberdeck-nerv.jsonc" "$stage/waybar/layouts/"
@@ -76,41 +80,76 @@ _stage_repo() {
     echo "$stage"
 }
 
-@test "activate_waybar_layout materializes config.jsonc, style.css, defaults.css" {
+@test "deploy_waybar materializes file-level symlinks at ~/.config/waybar" {
     local stage; stage="$(_stage_repo)"
     REPO_ROOT="$stage" run bash -c "
-        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' \
+               NONINTERACTIVE=1 ON_CONFLICT=overwrite
         source '$stage/scripts/06_symlinks.sh'
-        DRY_RUN=0 activate_waybar_layout
+        DRY_RUN=0 deploy_waybar
     "
     [ "$status" -eq 0 ]
-    [ -f "$stage/waybar/config.jsonc" ]
-    [ -f "$stage/waybar/style.css" ]
-    [ -f "$stage/waybar/defaults.css" ]
+    # ~/.config/waybar is now a real directory
+    [ -d "$TEST_TMP/.config/waybar" ]
+    [ ! -L "$TEST_TMP/.config/waybar" ]
+    # Subdirs are symlinked
+    [ -L "$TEST_TMP/.config/waybar/layouts" ]
+    [ -L "$TEST_TMP/.config/waybar/styles" ]
+    # Active layout/style/defaults are file-level symlinks pointing at the
+    # canonical sources under styles/ and layouts/
+    [ -L "$TEST_TMP/.config/waybar/config.jsonc" ]
+    [ -L "$TEST_TMP/.config/waybar/style.css" ]
+    [ -L "$TEST_TMP/.config/waybar/defaults.css" ]
+    [ "$(readlink -f "$TEST_TMP/.config/waybar/config.jsonc")" = "$stage/waybar/layouts/cyberdeck-nerv.jsonc" ]
+    [ "$(readlink -f "$TEST_TMP/.config/waybar/style.css")"    = "$stage/waybar/styles/cyberdeck-nerv.css" ]
 }
 
-@test "activate_waybar_layout style.css matches styles/cyberdeck-nerv.css (not concat)" {
+@test "deploy_waybar does NOT write generated files into the source repo dir" {
     local stage; stage="$(_stage_repo)"
     REPO_ROOT="$stage" run bash -c "
-        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' \
+               NONINTERACTIVE=1 ON_CONFLICT=overwrite
         source '$stage/scripts/06_symlinks.sh'
-        DRY_RUN=0 activate_waybar_layout
+        DRY_RUN=0 deploy_waybar
     "
     [ "$status" -eq 0 ]
-    diff -q "$stage/waybar/style.css" "$stage/waybar/styles/cyberdeck-nerv.css"
+    # The pre-PR-G activate_waybar_layout used to cp into here — must not
+    # happen anymore.
+    [ ! -e "$stage/waybar/config.jsonc" ]
+    [ ! -e "$stage/waybar/style.css" ]
+    [ ! -e "$stage/waybar/defaults.css" ]
 }
 
-@test "activate_waybar_layout DRY_RUN=1 creates no files" {
+@test "deploy_waybar migrates an existing dir-symlink layout" {
     local stage; stage="$(_stage_repo)"
+    # Simulate a pre-PR-G install: ~/.config/waybar is a symlink to repo/waybar
+    mkdir -p "$TEST_TMP/.config"
+    ln -s "$stage/waybar" "$TEST_TMP/.config/waybar"
+    [ -L "$TEST_TMP/.config/waybar" ]
+
     REPO_ROOT="$stage" run bash -c "
-        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' NONINTERACTIVE=1
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' \
+               NONINTERACTIVE=1 ON_CONFLICT=overwrite
         source '$stage/scripts/06_symlinks.sh'
-        DRY_RUN=1 activate_waybar_layout
+        DRY_RUN=0 deploy_waybar
     "
     [ "$status" -eq 0 ]
-    [ ! -f "$stage/waybar/config.jsonc" ]
-    [ ! -f "$stage/waybar/style.css" ]
-    [ ! -f "$stage/waybar/defaults.css" ]
+    [ -d "$TEST_TMP/.config/waybar" ]
+    [ ! -L "$TEST_TMP/.config/waybar" ]
+    [ -L "$TEST_TMP/.config/waybar/config.jsonc" ]
+}
+
+@test "deploy_waybar DRY_RUN=1 creates nothing" {
+    local stage; stage="$(_stage_repo)"
+    REPO_ROOT="$stage" run bash -c "
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' \
+               NONINTERACTIVE=1 ON_CONFLICT=overwrite
+        source '$stage/scripts/06_symlinks.sh'
+        DRY_RUN=1 deploy_waybar
+    "
+    [ "$status" -eq 0 ]
+    [ ! -e "$TEST_TMP/.config/waybar" ]
+    [ ! -e "$stage/waybar/config.jsonc" ]
 }
 
 @test "deploy_wallpapers copies wallpapers from submodule pack/ recursively" {

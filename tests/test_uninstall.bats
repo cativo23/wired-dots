@@ -92,9 +92,9 @@ _source_uninstall() {
     [ ! -e "$HOME/.config/hypr" ]
 }
 
-@test "main flow removes 17 config symlinks and 4 bin symlinks (DRY_RUN=1)" {
+@test "main flow removes 16 config symlinks and 4 bin symlinks (DRY_RUN=1)" {
     # Pre-stage symlinks for every CONFIG_DIRS + BIN_FILES entry.
-    local dirs=(hypr waybar kitty starship fastfetch swaync rofi wlogout
+    local dirs=(hypr kitty starship fastfetch swaync rofi wlogout
                 bat gtk-3.0 gtk-4.0 qt5ct qt6ct Kvantum xdg-desktop-portal
                 wireplumber git)
     local bins=(cliphist-rofi power-profile-switch screenshot.sh wallpaper)
@@ -110,8 +110,8 @@ _source_uninstall() {
     [[ "$output" == *"would unlink"* ]]
 }
 
-@test "main flow removes 17 config symlinks and 4 bin symlinks (real run)" {
-    local dirs=(hypr waybar kitty starship fastfetch swaync rofi wlogout
+@test "main flow removes 16 config symlinks and 4 bin symlinks (real run)" {
+    local dirs=(hypr kitty starship fastfetch swaync rofi wlogout
                 bat gtk-3.0 gtk-4.0 qt5ct qt6ct Kvantum xdg-desktop-portal
                 wireplumber git)
     local bins=(cliphist-rofi power-profile-switch screenshot.sh wallpaper)
