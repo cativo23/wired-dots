@@ -23,7 +23,7 @@ CONFIG_DIRS=(
     wireplumber git
 )
 HOME_DOTFILES=( .zshenv .gtkrc-2.0 )
-BIN_FILES=( cliphist-rofi power-profile-switch screenshot.sh wallpaper waybar-claude-code )
+BIN_FILES=( cliphist-rofi power-profile-switch screenshot.sh wallpaper )
 
 # Direct-deploy /etc files (no .wired.bkp sentinel — installer cp's them).
 # Listed for the user to sudo rm manually. Format: "path|description".

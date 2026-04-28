@@ -1,7 +1,6 @@
 {
     "include": [
         "$HOME/.config/waybar/modules/custom-separator.jsonc",
-        "$HOME/.config/waybar/modules/custom-claude-code.jsonc",
         "$HOME/.config/waybar/modules/custom-nerv.jsonc",
         "$HOME/.config/waybar/modules/network.jsonc",
         "$HOME/.config/waybar/modules/custom-uptime.jsonc",

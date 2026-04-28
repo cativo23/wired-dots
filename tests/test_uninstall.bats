@@ -92,12 +92,12 @@ _source_uninstall() {
     [ ! -e "$HOME/.config/hypr" ]
 }
 
-@test "main flow removes 18 config symlinks and 5 bin symlinks (DRY_RUN=1)" {
+@test "main flow removes 18 config symlinks and 4 bin symlinks (DRY_RUN=1)" {
     # Pre-stage symlinks for every CONFIG_DIRS + BIN_FILES entry.
     local dirs=(hypr waybar kitty starship fastfetch zsh swaync rofi wlogout
                 bat gtk-3.0 gtk-4.0 qt5ct qt6ct Kvantum xdg-desktop-portal
                 wireplumber git)
-    local bins=(cliphist-rofi power-profile-switch screenshot.sh wallpaper waybar-claude-code)
+    local bins=(cliphist-rofi power-profile-switch screenshot.sh wallpaper)
     for d in "${dirs[@]}"; do ln -s /tmp "$HOME/.config/$d"; done
     for b in "${bins[@]}"; do ln -s /tmp "$HOME/.local/bin/$b"; done
 
@@ -110,11 +110,11 @@ _source_uninstall() {
     [[ "$output" == *"would unlink"* ]]
 }
 
-@test "main flow removes 18 config symlinks and 5 bin symlinks (real run)" {
+@test "main flow removes 18 config symlinks and 4 bin symlinks (real run)" {
     local dirs=(hypr waybar kitty starship fastfetch zsh swaync rofi wlogout
                 bat gtk-3.0 gtk-4.0 qt5ct qt6ct Kvantum xdg-desktop-portal
                 wireplumber git)
-    local bins=(cliphist-rofi power-profile-switch screenshot.sh wallpaper waybar-claude-code)
+    local bins=(cliphist-rofi power-profile-switch screenshot.sh wallpaper)
     for d in "${dirs[@]}"; do ln -s /tmp "$HOME/.config/$d"; done
     for b in "${bins[@]}"; do ln -s /tmp "$HOME/.local/bin/$b"; done
 
