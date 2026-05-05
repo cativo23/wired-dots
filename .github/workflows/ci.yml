@@ -49,6 +49,7 @@ jobs:
           globs: |
             **/*.md
             !.superpowers/**
+            !docs/superpowers/**
             !node_modules/**
 
       - name: TOML schema validation (taplo)
