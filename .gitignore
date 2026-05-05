@@ -46,3 +46,24 @@ docs/screenshots/*.xcf
 source/wallpapers/*.part
 *.pkg.tar.zst
 .superpowers/
+
+# wired-dots cache and runtime state
+~/.config/wired/
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# CI artifacts
+*.log
+*.tar.gz
+release-notes-*.md
+
+# Test outputs
+tests/**/output/
+tests/**/.bats_tmpdir/
