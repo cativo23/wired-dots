@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "fix/**", "release/**"]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (bash, markdown, toml, secrets)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bash syntax check (bash -n)
+        run: |
+          set -euo pipefail
+          shopt -s globstar nullglob
+          fail=0
+          for f in **/*.sh; do
+            if ! bash -n "$f"; then
+              echo "::error file=$f::bash -n failed"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Shellcheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          severity: warning
+          scandir: '.'
+          ignore_paths: |
+            .git
+            .superpowers
+            docs
+
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            **/*.md
+            !.superpowers/**
+            !node_modules/**
+
+      - name: TOML schema validation (taplo)
+        run: |
+          set -euo pipefail
+          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-linux-x86_64.gz \
+            | gunzip > /tmp/taplo
+          chmod +x /tmp/taplo
+          mapfile -t toml_files < <(find . -name '*.toml' -not -path './.git/*' -not -path './.superpowers/*' 2>/dev/null)
+          if [[ ${#toml_files[@]} -eq 0 ]]; then
+            echo "No TOML files found, skipping taplo"
+            exit 0
+          fi
+          /tmp/taplo lint "${toml_files[@]}"
+          /tmp/taplo format --check "${toml_files[@]}"
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: .gitleaks.toml
