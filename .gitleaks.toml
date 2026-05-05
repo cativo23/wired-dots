@@ -1,0 +1,18 @@
+# wired-dots — gitleaks config
+# Custom rules layered on top of the default ruleset.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist for wired-dots"
+
+regexes = [
+  '''ANTHROPIC_AUTH_TOKEN.*your-token-here''',
+  '''ANTHROPIC_AUTH_TOKEN=""''',
+]
+
+paths = [
+  '''.superpowers/.*''',
+  '''docs/screenshots/.*''',
+]
