@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc4] — 2026-05-14
+
+Post-rc3 validation cycle — 4 targeted fixes from the rc3 audit findings.
+
+### Added
+
+- **`~/.local/bin` on PATH** — `wired-defaults.zsh` now prepends `~/.local/bin` automatically, so wired-dots helper scripts (`screenshot.sh`, `wallpaper`, `cliphist-rofi`, `power-profile-switch`) are reachable from a terminal, not just Hyprland keybinds.
+
+### Fixed
+
+- **TLP killed by PPD re-activation at first boot** — `power-profiles-daemon` was D-Bus-activated at boot even after `systemctl disable` because the socket unit remained enabled. The installer now masks PPD unconditionally when `--with-tlp` is selected, preventing re-activation.
+- **Home dotfiles below top level never deployed** — `link_home_dotfiles` used `find -maxdepth 1`, silently skipping nested files like `home/.config/uwsm/env`. Now the full subtree is walked.
+- **Post-install verifier false positives for waybar/zsh** — the `10c` verifier reported `~/.config/waybar` and `~/.config/zsh` as "missing or broken" when they were correctly installed as file-level symlink layouts (introduced in rc3). Verifier now accepts both layouts.
+
 ## [1.0.0-rc3] — 2026-04-28
 
 The "audit cycle" — Carlos asked for an honest review of what was personal-Carlos noise vs reusable framework, plus the visible waybar bugs that had been broken since rc1. Result: 7 focused PRs that strip the personal layer, parameterize the install, and add a static smoke test that catches the bug class in CI.
