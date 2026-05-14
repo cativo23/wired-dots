@@ -14,22 +14,24 @@ SYSTEM_SERVICES=(
     acpid          # ACPI events (lid, power button) — required for graceful suspend
 )
 
-# Power management: with --with-tlp the user picked TLP over PPD. Disable
-# PPD if it lingers from a previous run, and enable tlp.service. Without
-# --with-tlp we let PPD's own systemd preset handle enablement (ships
-# enabled by default).
+# Power management: with --with-tlp the user picked TLP over PPD. Mask PPD
+# so it cannot be started by systemd nor reactivated via D-Bus activation
+# (D-Bus-activated units survive a plain `disable`), then enable tlp.service.
+# Without --with-tlp we leave PPD alone.
 swap_power_service() {
     if [[ "${WITH_TLP:-0}" != "1" ]]; then
         return 0
     fi
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would disable power-profiles-daemon, enable tlp"
+        log_info "[dry-run] would mask power-profiles-daemon, enable tlp"
         return 0
     fi
-    if systemctl is-enabled power-profiles-daemon.service &>/dev/null; then
-        sudo systemctl disable --now power-profiles-daemon.service \
-            && log_ok "power-profiles-daemon.service disabled" \
-            || log_warn "could not disable power-profiles-daemon"
+    # PPD may be installed but dbus-activated even when disabled — mask it so
+    # it can neither be started by systemd nor reactivated via dbus.
+    if systemctl list-unit-files power-profiles-daemon.service &>/dev/null; then
+        sudo systemctl mask --now power-profiles-daemon.service \
+            && log_ok "power-profiles-daemon.service masked" \
+            || log_warn "could not mask power-profiles-daemon"
     fi
     if systemctl list-unit-files tlp.service &>/dev/null; then
         sudo systemctl enable --now tlp.service \
