@@ -10,6 +10,12 @@
 # preserved across updates belongs in user.zsh (one-time copy on first
 # install) or user.local.zsh (gitignored, never touched by installer).
 
+# Ensure ~/.local/bin is on PATH (wired-dots ships helper scripts there).
+case ":${PATH:-}:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:${PATH}" ;;
+esac
+
 # Show fastfetch on interactive shells. Kept here because it ships with
 # wired-dots and is part of the "first-impression" UX.
 if [[ $- == *i* ]]; then
