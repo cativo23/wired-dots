@@ -108,7 +108,7 @@ link_home_dotfiles() {
         local dst="$HOME/$rel"
         symlink_safe "$file" "$dst"
         (( count++ )) || true
-    done < <(find "$home_src" -maxdepth 1 -type f -print0 2>/dev/null)
+    done < <(find "$home_src" -type f -print0 2>/dev/null)
 
     if [[ $count -eq 0 ]]; then
         log_skip "home/ directory is empty — no home dotfiles to link"

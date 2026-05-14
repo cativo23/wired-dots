@@ -44,6 +44,26 @@ teardown() { rm -rf "$TEST_TMP"; }
     [ "$status" -eq 0 ]
 }
 
+@test "link_home_dotfiles links nested files (e.g. .config/uwsm/env)" {
+    # Stage an isolated repo tree so we don't mutate the real REPO_ROOT.
+    local stage="$TEST_TMP/repo"
+    mkdir -p "$stage/scripts" "$stage/home/.config/uwsm"
+    printf 'XDG_SESSION_DESKTOP=Hyprland\n' > "$stage/home/.config/uwsm/env"
+    cp "$REPO_ROOT/scripts/global_fn.sh" "$stage/scripts/"
+    cp "$REPO_ROOT/scripts/06_symlinks.sh" "$stage/scripts/"
+
+    REPO_ROOT="$stage" run bash -c "
+        export REPO_ROOT='$stage' WIRED_LOG_FILE=/dev/null HOME='$TEST_TMP' \
+               NONINTERACTIVE=1 ON_CONFLICT=overwrite
+        source '$stage/scripts/06_symlinks.sh'
+        DRY_RUN=0 link_home_dotfiles
+    "
+    [ "$status" -eq 0 ]
+    # Nested file must be symlinked at the correct target path
+    [ -L "$TEST_TMP/.config/uwsm/env" ]
+    [ "$(readlink -f "$TEST_TMP/.config/uwsm/env")" = "$stage/home/.config/uwsm/env" ]
+}
+
 @test "link_bin_files skips gracefully when bin/ is empty" {
     source "$REPO_ROOT/scripts/06_symlinks.sh"
     DRY_RUN=0 ON_CONFLICT=overwrite run link_bin_files
