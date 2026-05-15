@@ -30,3 +30,18 @@ export EDITOR="${EDITOR:-nano}"
 
 # System update — opinionated but useful default.
 alias sysup='paru -Syu --noconfirm 2>/dev/null || yay -Syu --noconfirm; flatpak update 2>/dev/null'
+
+# zsh-autosuggestions (gray inline predictive completion)
+[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# zsh-history-substring-search (Up/Down filter by substring)
+if [[ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
+    source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+fi
+
+# zsh-syntax-highlighting (LAST — its docs require sourcing after other widgets)
+[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+    source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
