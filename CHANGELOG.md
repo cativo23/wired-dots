@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-05-15
+
+First stable release. Built incrementally through five release candidates with live hardware validation on an AMD Bobcat / Radeon HD 7340 laptop. No new functional changes vs. `1.0.0-rc5`; this tag simply promotes the validated rc5 tree to stable.
+
+### Release highlights
+
+- Hyprland-based Wayland desktop with the Tokyo Night palette throughout (waybar, kitty, starship, hyprlock, fastfetch, SDDM, GRUB).
+- Idempotent 20-phase installer (`scripts/00_preflight.sh` → `scripts/10c_verification.sh`) covering hardware detection, packages, audio, fonts, bluetooth, AUR, GPU drivers (NVIDIA/AMD/Intel), power management (TLP), WiFi, symlinks, theme, SDDM, bootloader theme, services, XDG portals, verification.
+- User-facing install flags: `--kb-layout`, `--with-browser`, `--with-file-manager`, `--with-tlp`. Choices persist to `~/.cache/wired-dots/user-choices.conf` for reproducible re-runs.
+- File-level symlink layout for `~/.config/waybar/` and `~/.config/zsh/` so user edits to non-managed files survive every `./install.sh` run.
+- Post-install verifier (`10c`) reports both packages and managed paths; accepts whole-dir symlinks and file-level layouts so users can pick either pattern.
+- Hardware-aware TLP delivery: charge thresholds only written on devices that support them; PPD masked (not just disabled) to prevent D-Bus re-activation.
+- Optional opt-in modules documented in `docs/optional-modules.md` (Claude Code waybar module, hyprlock profile picture, etc.).
+- 39 bats tests covering install flags, symlinks, services, verification, zsh-split, GPU phases, theme, bootloader, preflight, backup, and waybar static smoke. CI runs them on Ubuntu and an Arch container.
+
+See the `1.0.0-rcN` entries below for the incremental change history.
+
 ## [1.0.0-rc5] — 2026-05-15
 
 Two targeted fixes from the rc4 validation cycle.
