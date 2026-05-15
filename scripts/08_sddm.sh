@@ -61,22 +61,43 @@ write_sddm_conf() {
     log_ok "SDDM config written → $SDDM_CONF_FILE (Theme=$SDDM_THEME)"
 }
 
-select_silent_variant() {
-    # Silent SDDM theme reads /etc/sddm/themes/silent/conf.d/*.conf overrides;
-    # writing the variant there keeps the change out of the package's own files.
-    if [[ ! -d "$SDDM_THEME_DIR" ]]; then
-        log_skip "$SDDM_THEME_DIR not present, skipping variant selection"
+apply_silent_variant_to_metadata() {
+    # The Silent SDDM theme reads ONLY metadata.desktop to determine which
+    # config file is active (per upstream README "Customizing" section).
+    # The /etc/sddm/themes/silent/conf.d/ path we used in rc3/rc4 was
+    # invented by us — the theme never reads it.
+    local metadata_file="${SDDM_THEME_DIR}/metadata.desktop"
+
+    if [[ ! -f "$metadata_file" ]]; then
+        log_skip "metadata.desktop not found at ${metadata_file} — theme may not be installed yet"
         return 0
     fi
+
+    # Clean up the dead conf.d override written by prior rc installs.
+    local dead_override="/etc/sddm/themes/${SDDM_THEME}/conf.d/00-wired-variant.conf"
+    if [[ -f "$dead_override" ]]; then
+        sudo rm -f "$dead_override"
+        # Remove the directory only if now empty.
+        sudo rmdir --ignore-fail-on-non-empty "/etc/sddm/themes/${SDDM_THEME}/conf.d" 2>/dev/null || true
+        log_info "removed stale conf.d override (${dead_override})"
+    fi
+
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
-        log_info "[dry-run] would set Silent variant=${SDDM_VARIANT}"
+        log_info "[dry-run] would set ConfigFile=configs/${SDDM_VARIANT}.conf in ${metadata_file}"
         return 0
     fi
-    local override_dir="/etc/sddm/themes/${SDDM_THEME}/conf.d"
-    sudo mkdir -p "$override_dir"
-    printf '[General]\nvariant=%s\n' "$SDDM_VARIANT" \
-        | sudo tee "$override_dir/00-wired-variant.conf" > /dev/null
-    log_ok "Silent SDDM variant set: ${SDDM_VARIANT}"
+
+    # Idempotent: skip if the correct line is already present.
+    if grep -q "^ConfigFile=configs/${SDDM_VARIANT}.conf" "$metadata_file"; then
+        log_skip "Silent SDDM already uses '${SDDM_VARIANT}' variant"
+        return 0
+    fi
+
+    # Remove all ConfigFile= lines (including commented alternatives), then append.
+    sudo sed -i '/^[#]*ConfigFile=/d' "$metadata_file"
+    printf 'ConfigFile=configs/%s.conf\n' "$SDDM_VARIANT" \
+        | sudo tee -a "$metadata_file" > /dev/null
+    log_ok "Silent SDDM variant set to '${SDDM_VARIANT}' via metadata.desktop"
 }
 
 main() {
@@ -84,7 +105,7 @@ main() {
     install_packages SDDM_PACKAGES "sudo" "pacman" "-S" "--needed" "--noconfirm"
     install_silent_theme
     write_sddm_conf
-    select_silent_variant
+    apply_silent_variant_to_metadata
     log_ok "SDDM setup complete"
 }
 
