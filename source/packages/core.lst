@@ -6,6 +6,9 @@ ttf-dejavu
 ttf-liberation
 cantarell-fonts
 
+# Network utilities (provides hostname — used by waybar nerv module)
+inetutils
+
 # Compositor + session
 hyprland
 uwsm

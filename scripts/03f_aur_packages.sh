@@ -36,6 +36,20 @@ main() {
     fi
 
     install_packages pkgs_raw "${AUR_HELPER:-yay}" "-S" "--needed" "--noconfirm"
+
+    # Fail-loud: report any AUR package that didn't make it into pacman's db.
+    local failed=()
+    for pkg in "${pkgs_raw[@]}"; do
+        pacman -Qq "$pkg" &>/dev/null || failed+=("$pkg")
+    done
+    if [[ ${#failed[@]} -gt 0 ]]; then
+        log_warn "AUR build failed for: ${failed[*]}"
+        local log_dir="$HOME/.cache/wired-dots"
+        mkdir -p "$log_dir"
+        printf '%s\n' "${failed[@]}" > "$log_dir/aur-failed.log"
+        log_warn "Failed package list saved to $log_dir/aur-failed.log"
+    fi
+
     log_ok "AUR packages complete"
 }
 
