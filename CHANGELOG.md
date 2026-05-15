@@ -13,7 +13,7 @@ Two targeted fixes from the rc4 validation cycle.
 
 ### Fixed
 
-- **SDDM Silent `rei` variant now actually applied** — prior installs wrote a `conf.d` override the theme silently ignored (the path was invented by us). Upstream Silent reads `metadata.desktop` exclusively; the installer now edits `ConfigFile=` there and cleans up the stale override left by rc3/rc4.
+- **SDDM Silent `rei` variant now correctly applied** — previous installs silently fell back to the default preset because the variant-selection override was written to a location the theme doesn't read. The installer now sets the variant in the right place and removes the stale override left by rc3/rc4.
 - **GRUB Elegant `mojave-float-left-dark` theme now installed** — the README promised this since rc1 but phase 09 had no install code. The theme is now git-cloned at tag `2025-03-25` and installed via upstream's `install.sh`, with a single `grub-mkconfig` run at the end capturing both the cmdline patch and the theme path.
 
 ## [1.0.0-rc4] — 2026-05-14
