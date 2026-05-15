@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc5] — 2026-05-15
+
+Two targeted fixes from the rc4 validation cycle.
+
+### Fixed
+
+- **SDDM Silent `rei` variant now actually applied** — prior installs wrote a `conf.d` override the theme silently ignored (the path was invented by us). Upstream Silent reads `metadata.desktop` exclusively; the installer now edits `ConfigFile=` there and cleans up the stale override left by rc3/rc4.
+- **GRUB Elegant `mojave-float-left-dark` theme now installed** — the README promised this since rc1 but phase 09 had no install code. The theme is now git-cloned at tag `2025-03-25` and installed via upstream's `install.sh`, with a single `grub-mkconfig` run at the end capturing both the cmdline patch and the theme path.
+
 ## [1.0.0-rc4] — 2026-05-14
 
 Post-rc3 validation cycle — 4 targeted fixes from the rc3 audit findings.
