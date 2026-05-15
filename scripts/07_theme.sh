@@ -8,11 +8,27 @@ export REPO_ROOT SCRIPTS_DIR
 # shellcheck source=scripts/global_fn.sh
 source "$SCRIPTS_DIR/global_fn.sh"
 
-GTK_THEME="Tokyonight-GTK-BL"
+GTK_THEME="Tokyo-Night"
 ICON_THEME="Tela-circle-dracula"
 CURSOR_THEME="phinger-cursors-dark"
 CURSOR_SIZE=24
-FONT_NAME="Red Hat Display 11"
+FONT_NAME="Cantarell 10"
+
+install_gtk_theme() {
+    local src="$REPO_ROOT/source/themes/tokyo-night/gtk/Tokyo-Night"
+    local dst="$HOME/.local/share/themes/Tokyo-Night"
+    if [[ "${DRY_RUN:-0}" == "1" ]]; then
+        log_info "[dry-run] would install GTK theme: $src → $dst"
+        return 0
+    fi
+    if [[ ! -d "$src" ]]; then
+        log_warn "vendored GTK theme not found at $src — skipping install"
+        return 0
+    fi
+    mkdir -p "$(dirname "$dst")"
+    cp -a "$src" "$dst"
+    log_ok "GTK theme installed: $dst"
+}
 
 apply_gtk_theme() {
     if [[ "${DRY_RUN:-0}" == "1" ]]; then
@@ -52,6 +68,7 @@ write_gtk3_ini() {
 
 main() {
     log_step "07" "theme"
+    install_gtk_theme
     apply_gtk_theme
     apply_cursor_theme
     write_gtk3_ini
