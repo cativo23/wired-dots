@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-05-15
+
+First patch release. Eleven fixes from live VM testing that revealed gaps the original hardware validation didn't surface (dummy box only checked waybar + boot, never opened a real Qt/GTK app session).
+
+### Added
+- **zsh productivity plugins shipped by default** — autosuggestions (gray inline predictions), syntax-highlighting (live command coloring), history-substring-search (Up/Down filter by substring). Users get the modern shell experience out of the box.
+- **Base Latin + Cantarell UI fonts** in `core.lst` (`ttf-dejavu`, `ttf-liberation`, `cantarell-fonts`). Removes the dependency on AUR fonts loading correctly for basic text rendering.
+- **`inetutils`** for `hostname` command (used by waybar nerv module).
+
+### Fixed
+- **Hyprland error popup on every login** — `misc:vfr` was removed upstream; cleaned out of all three workflow configs.
+- **rofi launcher would not render** — Tokyo Night theme had three classes of rasi syntax errors (CSS-style `border` shorthand with `@reference`, `color:` instead of `text-color:`, unsupported `>` child combinator). Theme rewritten.
+- **Qt apps rendered all text as empty boxes (`.notdef` tofu)** — qt6ct/qt5ct shipped with only `fixed=` font in binary `@Variant` format. Now ships both `general=` and `fixed=` in plain-text `QFont::toString()` format (Cantarell for UI, CaskaydiaCove Nerd Font Mono for monospace).
+- **KDE apps (Dolphin, Kate, kwallet) showed dark text on dark backgrounds** — `~/.config/kdeglobals` was missing entirely; without it KColorScheme falls back to Breeze light-mode defaults and ignores the Kvantum/qt6ct color chain. Now shipped at `home/.config/kdeglobals`.
+- **Kvantum Tokyo Night theme applied no colors** — the AUR package `kvantum-theme-tokyo-night` (referenced in `aur.lst`) has never existed in AUR. Real theme assets (`TokyoNight.kvconfig` + `TokyoNight.svg`) now vendored directly in the repo.
+- **GTK apps used the default Adwaita light theme regardless of settings** — modern Wayland GTK apps read theme from `gsettings`, not `settings.ini`. Phase 07 now installs the Tokyo-Night theme to `~/.local/share/themes/` and sets the canonical gsettings keys.
+- **`notify-send -u critical` notifications had no urgency styling** — `swaync/style.css` used `.urgent` (a dunst class name) where swaync expects `.critical`. Renamed.
+
+### Hardened
+- **AUR build failures now fail loud** — phase 03f tracks every AUR package and reports failed builds at the end of install, with a list written to `~/.cache/wired-dots/aur-failed.log`. Previously builds failed silently and the install reported success despite missing themes/fonts.
+- **Dropped phantom AUR reference** to `kvantum-theme-tokyo-night` (never existed in AUR).
+
 ## [1.0.0] — 2026-05-15
 
 First stable release. Built incrementally through five release candidates with live hardware validation on an AMD Bobcat / Radeon HD 7340 laptop. No new functional changes vs. `1.0.0-rc5`; this tag simply promotes the validated rc5 tree to stable.
