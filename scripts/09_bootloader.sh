@@ -92,8 +92,6 @@ install_grub_elegant_theme() {
 
     if (cd "${tmpdir}/Elegant-grub2-themes" && sudo bash install.sh -t mojave -p float -i left -c dark); then
         log_ok "GRUB Elegant theme installed (mojave-float-left-dark)"
-        # Signal to main() that mkconfig must run.
-        GRUB_THEME_INSTALLED=1
     else
         log_err "Elegant install.sh failed — GRUB theme not installed"
     fi
@@ -119,7 +117,6 @@ main() {
     log_step "09" "bootloader"
 
     local bl="${BOOTLOADER:-unknown}"
-    GRUB_THEME_INSTALLED=0
 
     case "$bl" in
         grub)
