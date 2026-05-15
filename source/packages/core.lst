@@ -1,6 +1,11 @@
 # wired-dots — core pacman packages
 # Format: package # comment
 
+# Base fonts (always installable from extra repo — no silent AUR failures)
+ttf-dejavu
+ttf-liberation
+cantarell-fonts
+
 # Compositor + session
 hyprland
 uwsm
