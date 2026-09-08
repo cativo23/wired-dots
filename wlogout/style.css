@@ -39,7 +39,7 @@ button:hover {
 #lock {
     border-radius: 10px 0px 0px 10px;
     margin: 10px 0px 10px 10px;
-    background-image: image(url("/usr/share/wlogout/icons/lock.png"));
+    background-image: url("./icons/lock.svg");
 }
 button:hover#lock {
     border-radius: 10px;
@@ -52,7 +52,7 @@ button:hover#lock {
 
 #logout {
     margin: 10px 0px;
-    background-image: image(url("/usr/share/wlogout/icons/logout.png"));
+    background-image: url("./icons/logout.svg");
 }
 button:hover#logout {
     border-radius: 10px;
@@ -65,7 +65,7 @@ button:hover#logout {
 
 #suspend {
     margin: 10px 0px;
-    background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
+    background-image: url("./icons/suspend.svg");
 }
 button:hover#suspend {
     border-radius: 10px;
@@ -78,7 +78,7 @@ button:hover#suspend {
 
 #shutdown {
     margin: 10px 0px;
-    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"));
+    background-image: url("./icons/shutdown.svg");
 }
 button:hover#shutdown {
     border-radius: 10px;
@@ -91,7 +91,7 @@ button:hover#shutdown {
 
 #hibernate {
     margin: 10px 0px;
-    background-image: image(url("/usr/share/wlogout/icons/hibernate.png"));
+    background-image: url("./icons/hibernate.svg");
 }
 button:hover#hibernate {
     border-radius: 10px;
@@ -105,7 +105,7 @@ button:hover#hibernate {
 #reboot {
     border-radius: 0px 10px 10px 0px;
     margin: 10px 10px 10px 0px;
-    background-image: image(url("/usr/share/wlogout/icons/reboot.png"));
+    background-image: url("./icons/reboot.svg");
 }
 button:hover#reboot {
     border-radius: 10px;
