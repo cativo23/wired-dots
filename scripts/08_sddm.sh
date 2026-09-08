@@ -9,7 +9,7 @@ export REPO_ROOT SCRIPTS_DIR
 source "$SCRIPTS_DIR/global_fn.sh"
 
 # shellcheck disable=SC2034  # passed to install_packages by nameref
-SDDM_PACKAGES=( sddm qt5-virtualkeyboard )
+SDDM_PACKAGES=( sddm qt6-virtualkeyboard )
 # shellcheck disable=SC2034  # AUR — passed to install_packages by nameref
 SDDM_AUR_PACKAGES=( sddm-silent-theme )
 SDDM_CONF_DIR="/etc/sddm.conf.d"

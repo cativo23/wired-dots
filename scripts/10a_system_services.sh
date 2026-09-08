@@ -98,7 +98,19 @@ enable_seatd() {
 change_login_shell() {
     # Switch the user's login shell to zsh. Required for ~/.config/zsh/.zshrc
     # to be sourced (and therefore starship/aliases to load) at SDDM login.
-    local user="${SUDO_USER:-${USER:-$(id -un)}}"
+    #
+    # NOTE: deliberately NOT using $SUDO_USER here. SUDO_USER always names
+    # whoever invoked `sudo`, not the account this process is actually
+    # running as — so when install.sh is launched via
+    # `sudo -u <target> -i bash install.sh` (e.g. side-by-side dogfood
+    # setups), SUDO_USER stays set to the outer/invoking account and this
+    # function silently chsh'd the WRONG user (confirmed on atlas: it kept
+    # "fixing" cativo23, who already had zsh, and never touched the actual
+    # target user, cativo-wd — leaving it on the useradd default shell and
+    # ~/.config/zsh/.zshrc unsourced). `id -un` is the effective/real user
+    # of this process either way and is what we actually want.
+    local user
+    user="$(id -un)"
     local current_shell
     current_shell="$(getent passwd "$user" | cut -d: -f7)"
 
