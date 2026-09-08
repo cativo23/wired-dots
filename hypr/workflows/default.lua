@@ -1,0 +1,16 @@
+-- wired-dots — workflow profile: default (Lua port of workflows/default.conf)
+
+hl.config({
+    decoration = {
+        blur = {
+            enabled = true,
+            size    = 4,
+            passes  = 2,
+        },
+        shadow = {
+            enabled = true,
+            range   = 15,
+            color   = "rgba(0,0,0,0.6)",
+        },
+    },
+})
