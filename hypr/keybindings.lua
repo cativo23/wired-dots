@@ -45,7 +45,8 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(FILE_MANAGER or "dolphin"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(BROWSER or "brave"))
 hl.bind("CONTROL + SHIFT + Escape", hl.dsp.exec_cmd("kitty --title sysmon -e btop"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
-hl.bind("CONTROL + ALT + Delete", hl.dsp.exec_cmd("wlogout"))
+-- -b 6 forces a single row of 6 buttons — see keybindings.conf for why.
+hl.bind("CONTROL + ALT + Delete", hl.dsp.exec_cmd("wlogout -b 6"))
 
 -- Rofi
 hl.bind(mainMod .. " + A",   hl.dsp.exec_cmd("pkill -x rofi || rofi -show drun"))
