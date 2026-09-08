@@ -28,4 +28,15 @@ bindkey -e
     source "${ZDOTDIR:-$HOME/.config/zsh}/user.zsh"
 
 # Starship prompt (init last so it overrides any earlier PROMPT)
-command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+#
+# STARSHIP_CONFIG must point at ~/.config/starship/starship.toml — wired-
+# dots symlinks the whole starship/ DIRECTORY (06_symlinks.sh), but
+# starship's own default config path is the flat ~/.config/starship.toml,
+# one level up. Without this export starship silently falls back to its
+# built-in default prompt (no Tokyo Night theme, no custom modules) —
+# confirmed live on atlas/cativo-wd. Same fix already applied on HyDE
+# (see ~/.config/zsh/conf.d/hyde/prompt.zsh on this machine).
+if command -v starship >/dev/null 2>&1; then
+    export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship/starship.toml"
+    eval "$(starship init zsh)"
+fi
