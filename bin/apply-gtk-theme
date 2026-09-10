@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# wired-dots — apply GTK theme via gsettings at session start
+#
+# scripts/07_theme.sh already writes these same values via gsettings
+# during install.sh, but that write only reaches the running session's
+# D-Bus if one already exists at install time. It doesn't when
+# install.sh runs via `sudo -u <user> -i` for a user with no live
+# session yet (e.g. a side-by-side dogfood account created and
+# provisioned before its first login) — gsettings silently no-ops.
+#
+# Wired as exec-once in userprefs.conf/.lua so it re-applies every
+# session start regardless of how install.sh was originally run.
+# Idempotent: skips gsettings entirely if values already match, only
+# restarts waybar/tray apps when something actually changed.
+#
+# Values MUST match scripts/07_theme.sh — no single source of truth for
+# both yet (07_theme.sh runs offline during install, this runs online
+# at session start; a future pass could generate this from one place).
+set -euo pipefail
+
+GTK_THEME="Tokyo-Night"
+ICON_THEME="Tela-circle-dracula"
+CURSOR_THEME="phinger-cursors-dark"
+CURSOR_SIZE="24"
+FONT_NAME="Cantarell 10"
+COLOR_SCHEME="prefer-dark"
+
+changed=0
+
+apply_if_different() {
+    local key="$1" want="$2"
+    local have
+    have="$(gsettings get org.gnome.desktop.interface "$key" 2>/dev/null | tr -d "'")"
+    if [[ "$have" != "$want" ]]; then
+        gsettings set org.gnome.desktop.interface "$key" "$want"
+        changed=1
+    fi
+}
+
+command -v gsettings >/dev/null 2>&1 || exit 0
+
+apply_if_different gtk-theme    "$GTK_THEME"
+apply_if_different icon-theme   "$ICON_THEME"
+apply_if_different cursor-theme "$CURSOR_THEME"
+apply_if_different cursor-size  "$CURSOR_SIZE"
+apply_if_different font-name    "$FONT_NAME"
+apply_if_different color-scheme "$COLOR_SCHEME"
+
+if [[ "$changed" -eq 1 ]]; then
+    # Tray apps (nm-applet, blueman-applet) and waybar read the icon
+    # theme once at startup — restart them so the new icons actually show.
+    pkill -x waybar 2>/dev/null || true
+    (sleep 0.3 && waybar >/dev/null 2>&1 &) & disown
+    for app in nm-applet blueman-applet; do
+        pkill -x "$app" 2>/dev/null || true
+        (sleep 0.3 && "$app" >/dev/null 2>&1 &) & disown
+    done
+fi

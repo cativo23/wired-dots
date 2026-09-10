@@ -53,6 +53,12 @@ hl.on("hyprland.start", function()
     -- Keyring (SSH agent + secret service for Brave, gh-cli, etc.)
     hl.exec_cmd("gnome-keyring-daemon --start --components=secrets,pkcs11")
 
+    -- GTK theme via gsettings (icon/gtk/cursor/font) — see bin/apply-gtk-theme
+    -- for why this can't just be install-time gsettings calls. Must run
+    -- before waybar starts below so it picks up the right icon theme on
+    -- first launch.
+    hl.exec_cmd("apply-gtk-theme")
+
     -- Core Hyprland helpers (need $WAYLAND_DISPLAY — use exec-once, not systemctl)
     hl.exec_cmd("hypridle")
     hl.exec_cmd("hyprpolkitagent")

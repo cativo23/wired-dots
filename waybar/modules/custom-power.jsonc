@@ -1,7 +1,7 @@
 {
   "custom/power": {
     "format": "󰐥",
-    "on-click": "wlogout 2>/dev/null || systemctl poweroff",
+    "on-click": "wlogout -b 6 2>/dev/null || systemctl poweroff",
     "tooltip": false,
     "interval": "once"
   }
